@@ -12,6 +12,9 @@ const listeners = new Set<WebSocket>()
 let broadcaster: WebSocket | null = null
 let recording: WriteStream | null = null
 let recordingPath: string | null = null
+// First MediaRecorder chunk carries the WebM init segment (EBML/Segment/codec).
+// Late-joining listeners can't decode anything without it, so we cache it.
+let initChunk: Buffer | null = null
 
 export function attachWebSocket(wss: WebSocketServer) {
   wss.on('connection', (ws, req) => {
@@ -42,6 +45,7 @@ function handleBroadcaster(ws: WebSocket) {
   ws.on('message', (data, isBinary) => {
     if (!isBinary) return
     const chunk = data as Buffer
+    if (!initChunk) initChunk = chunk
     recording?.write(chunk)
     for (const l of listeners) {
       if (l.readyState === WebSocket.OPEN) l.send(chunk, { binary: true })
@@ -54,6 +58,7 @@ function handleBroadcaster(ws: WebSocket) {
     recording?.end()
     recording = null
     recordingPath = null
+    initChunk = null
     for (const l of listeners) {
       if (l.readyState === WebSocket.OPEN) l.close(1000, 'Stream ended')
     }
@@ -65,6 +70,9 @@ function handleBroadcaster(ws: WebSocket) {
 function handleListener(ws: WebSocket) {
   listeners.add(ws)
   console.log(`[ws] listener connected (${listeners.size} total)`)
+  if (initChunk && ws.readyState === WebSocket.OPEN) {
+    ws.send(initChunk, { binary: true })
+  }
 
   ws.on('close', () => {
     listeners.delete(ws)
