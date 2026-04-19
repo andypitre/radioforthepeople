@@ -2,19 +2,17 @@ import { Link, createFileRoute, notFound, redirect } from '@tanstack/react-route
 import { useEffect, useRef, useState } from 'react'
 import { fetchShowBySlug } from '../server-fns'
 
-export const Route = createFileRoute('/$slug/broadcast')({
-  beforeLoad: ({ context }) => {
-    if (!context.user) throw redirect({ to: '/login' })
-  },
+export const Route = createFileRoute('/studio/$slug')({
   loader: async ({ params }) => {
     const show = await fetchShowBySlug({ data: params.slug })
     if (!show) throw notFound()
     if (show.viewerRole !== 'owner' && show.viewerRole !== 'cohost') {
+      // Not a member — send them to the public listen page
       throw redirect({ to: '/$slug', params: { slug: params.slug } })
     }
     return { show }
   },
-  component: BroadcastConsole,
+  component: StudioShow,
 })
 
 const WS_URL =
@@ -24,7 +22,7 @@ const WS_URL =
 
 type Status = 'idle' | 'connecting' | 'live' | 'error'
 
-function BroadcastConsole() {
+function StudioShow() {
   const { show } = Route.useLoaderData()
   const [status, setStatus] = useState<Status>('idle')
   const [error, setError] = useState<string | null>(null)
@@ -111,11 +109,9 @@ function BroadcastConsole() {
   return (
     <main style={{ fontFamily: 'system-ui', padding: '3rem', maxWidth: 640 }}>
       <p style={{ color: '#666', marginBottom: 0 }}>
-        <Link to="/$slug" params={{ slug: show.slug }}>
-          ← {show.name}
-        </Link>
+        <Link to="/studio">← Studio</Link>
       </p>
-      <h1 style={{ marginTop: '0.5rem' }}>Broadcast: {show.name}</h1>
+      <h1 style={{ marginTop: '0.5rem' }}>{show.name}</h1>
 
       <p>
         Status: <strong>{status}</strong>
@@ -133,7 +129,12 @@ function BroadcastConsole() {
 
       <p style={{ color: '#666', fontSize: '0.875rem', marginTop: '2rem' }}>
         Listeners can tune in at{' '}
-        <Link to="/$slug" params={{ slug: show.slug }}>
+        <Link
+          to="/$slug"
+          params={{ slug: show.slug }}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           /{show.slug}
         </Link>
         .

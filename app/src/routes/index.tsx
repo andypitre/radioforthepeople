@@ -18,7 +18,7 @@ function Home() {
             <a href="/auth/logout">Sign out</a>
           </p>
           <p>
-            <a href="/new-show">Create a show</a>
+            <Link to="/studio">Go to the studio →</Link>
           </p>
         </>
       ) : (

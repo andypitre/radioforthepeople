@@ -9,13 +9,19 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as StudioRouteImport } from './routes/studio'
 import { Route as NewShowRouteImport } from './routes/new-show'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as SlugRouteImport } from './routes/$slug'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as SlugIndexRouteImport } from './routes/$slug.index'
-import { Route as SlugBroadcastRouteImport } from './routes/$slug.broadcast'
+import { Route as StudioIndexRouteImport } from './routes/studio.index'
+import { Route as StudioSlugRouteImport } from './routes/studio.$slug'
 
+const StudioRoute = StudioRouteImport.update({
+  id: '/studio',
+  path: '/studio',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const NewShowRoute = NewShowRouteImport.update({
   id: '/new-show',
   path: '/new-show',
@@ -36,40 +42,43 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SlugIndexRoute = SlugIndexRouteImport.update({
+const StudioIndexRoute = StudioIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => SlugRoute,
+  getParentRoute: () => StudioRoute,
 } as any)
-const SlugBroadcastRoute = SlugBroadcastRouteImport.update({
-  id: '/broadcast',
-  path: '/broadcast',
-  getParentRoute: () => SlugRoute,
+const StudioSlugRoute = StudioSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => StudioRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/$slug': typeof SlugRouteWithChildren
+  '/$slug': typeof SlugRoute
   '/login': typeof LoginRoute
   '/new-show': typeof NewShowRoute
-  '/$slug/broadcast': typeof SlugBroadcastRoute
-  '/$slug/': typeof SlugIndexRoute
+  '/studio': typeof StudioRouteWithChildren
+  '/studio/$slug': typeof StudioSlugRoute
+  '/studio/': typeof StudioIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/$slug': typeof SlugRoute
   '/login': typeof LoginRoute
   '/new-show': typeof NewShowRoute
-  '/$slug/broadcast': typeof SlugBroadcastRoute
-  '/$slug': typeof SlugIndexRoute
+  '/studio/$slug': typeof StudioSlugRoute
+  '/studio': typeof StudioIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/$slug': typeof SlugRouteWithChildren
+  '/$slug': typeof SlugRoute
   '/login': typeof LoginRoute
   '/new-show': typeof NewShowRoute
-  '/$slug/broadcast': typeof SlugBroadcastRoute
-  '/$slug/': typeof SlugIndexRoute
+  '/studio': typeof StudioRouteWithChildren
+  '/studio/$slug': typeof StudioSlugRoute
+  '/studio/': typeof StudioIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -78,29 +87,39 @@ export interface FileRouteTypes {
     | '/$slug'
     | '/login'
     | '/new-show'
-    | '/$slug/broadcast'
-    | '/$slug/'
+    | '/studio'
+    | '/studio/$slug'
+    | '/studio/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/new-show' | '/$slug/broadcast' | '/$slug'
+  to: '/' | '/$slug' | '/login' | '/new-show' | '/studio/$slug' | '/studio'
   id:
     | '__root__'
     | '/'
     | '/$slug'
     | '/login'
     | '/new-show'
-    | '/$slug/broadcast'
-    | '/$slug/'
+    | '/studio'
+    | '/studio/$slug'
+    | '/studio/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  SlugRoute: typeof SlugRouteWithChildren
+  SlugRoute: typeof SlugRoute
   LoginRoute: typeof LoginRoute
   NewShowRoute: typeof NewShowRoute
+  StudioRoute: typeof StudioRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/studio': {
+      id: '/studio'
+      path: '/studio'
+      fullPath: '/studio'
+      preLoaderRoute: typeof StudioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/new-show': {
       id: '/new-show'
       path: '/new-show'
@@ -129,40 +148,42 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/$slug/': {
-      id: '/$slug/'
+    '/studio/': {
+      id: '/studio/'
       path: '/'
-      fullPath: '/$slug/'
-      preLoaderRoute: typeof SlugIndexRouteImport
-      parentRoute: typeof SlugRoute
+      fullPath: '/studio/'
+      preLoaderRoute: typeof StudioIndexRouteImport
+      parentRoute: typeof StudioRoute
     }
-    '/$slug/broadcast': {
-      id: '/$slug/broadcast'
-      path: '/broadcast'
-      fullPath: '/$slug/broadcast'
-      preLoaderRoute: typeof SlugBroadcastRouteImport
-      parentRoute: typeof SlugRoute
+    '/studio/$slug': {
+      id: '/studio/$slug'
+      path: '/$slug'
+      fullPath: '/studio/$slug'
+      preLoaderRoute: typeof StudioSlugRouteImport
+      parentRoute: typeof StudioRoute
     }
   }
 }
 
-interface SlugRouteChildren {
-  SlugBroadcastRoute: typeof SlugBroadcastRoute
-  SlugIndexRoute: typeof SlugIndexRoute
+interface StudioRouteChildren {
+  StudioSlugRoute: typeof StudioSlugRoute
+  StudioIndexRoute: typeof StudioIndexRoute
 }
 
-const SlugRouteChildren: SlugRouteChildren = {
-  SlugBroadcastRoute: SlugBroadcastRoute,
-  SlugIndexRoute: SlugIndexRoute,
+const StudioRouteChildren: StudioRouteChildren = {
+  StudioSlugRoute: StudioSlugRoute,
+  StudioIndexRoute: StudioIndexRoute,
 }
 
-const SlugRouteWithChildren = SlugRoute._addFileChildren(SlugRouteChildren)
+const StudioRouteWithChildren =
+  StudioRoute._addFileChildren(StudioRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  SlugRoute: SlugRouteWithChildren,
+  SlugRoute: SlugRoute,
   LoginRoute: LoginRoute,
   NewShowRoute: NewShowRoute,
+  StudioRoute: StudioRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -99,7 +99,7 @@ export async function handleAuthGoogleCallback(req: Request): Promise<Response> 
   })
 
   const token2 = signSession(userId)
-  const headers = new Headers({ Location: '/' })
+  const headers = new Headers({ Location: '/studio' })
   appendCookie(headers, sessionCookie(token2))
   appendCookie(headers, clearStateCookie())
   return new Response(null, { status: 302, headers })

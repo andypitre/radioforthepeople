@@ -43,6 +43,13 @@ function maybeReleaseRoom(slug: string) {
   }
 }
 
+function broadcastStatus(room: Room) {
+  const payload = JSON.stringify({ type: 'status', live: !!room.broadcaster })
+  for (const l of room.listeners) {
+    if (l.readyState === WebSocket.OPEN) l.send(payload)
+  }
+}
+
 export function attachWebSocket(wss: WebSocketServer) {
   wss.on('connection', async (ws, req) => {
     const url = new URL(req.url ?? '/', `http://${req.headers.host}`)
@@ -99,6 +106,7 @@ async function handleBroadcaster(
   )
   room.recording = createWriteStream(room.recordingPath)
   console.log(`[ws] broadcaster for "${slug}" connected → ${room.recordingPath}`)
+  broadcastStatus(room)
 
   ws.on('message', (data, isBinary) => {
     if (!isBinary) return
@@ -117,6 +125,7 @@ async function handleBroadcaster(
     room.recording = null
     room.recordingPath = null
     room.initChunk = null
+    broadcastStatus(room)
     for (const l of room.listeners) {
       if (l.readyState === WebSocket.OPEN) l.close(1000, 'Stream ended')
     }
@@ -134,6 +143,10 @@ function handleListener(ws: WebSocket, slug: string) {
   console.log(
     `[ws] listener for "${slug}" connected (${room.listeners.size} total)`,
   )
+  // Send initial status so the client doesn't assume live.
+  if (ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ type: 'status', live: !!room.broadcaster }))
+  }
   if (room.initChunk && ws.readyState === WebSocket.OPEN) {
     ws.send(room.initChunk, { binary: true })
   }
