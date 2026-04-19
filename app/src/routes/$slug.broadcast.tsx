@@ -1,8 +1,20 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { Link, createFileRoute, notFound, redirect } from '@tanstack/react-router'
 import { useEffect, useRef, useState } from 'react'
+import { fetchShowBySlug } from '../server-fns'
 
-export const Route = createFileRoute('/broadcast')({
-  component: Broadcast,
+export const Route = createFileRoute('/$slug/broadcast')({
+  beforeLoad: ({ context }) => {
+    if (!context.user) throw redirect({ to: '/login' })
+  },
+  loader: async ({ params }) => {
+    const show = await fetchShowBySlug({ data: params.slug })
+    if (!show) throw notFound()
+    if (show.viewerRole !== 'owner' && show.viewerRole !== 'cohost') {
+      throw redirect({ to: '/$slug', params: { slug: params.slug } })
+    }
+    return { show }
+  },
+  component: BroadcastConsole,
 })
 
 const WS_URL =
@@ -12,7 +24,8 @@ const WS_URL =
 
 type Status = 'idle' | 'connecting' | 'live' | 'error'
 
-function Broadcast() {
+function BroadcastConsole() {
+  const { show } = Route.useLoaderData()
   const [status, setStatus] = useState<Status>('idle')
   const [error, setError] = useState<string | null>(null)
   const [elapsed, setElapsed] = useState(0)
@@ -43,7 +56,9 @@ function Broadcast() {
       })
       streamRef.current = stream
 
-      const ws = new WebSocket(`${WS_URL}/ws?role=broadcaster`)
+      const ws = new WebSocket(
+        `${WS_URL}/ws?show=${encodeURIComponent(show.slug)}&role=broadcaster`,
+      )
       ws.binaryType = 'arraybuffer'
       wsRef.current = ws
 
@@ -70,8 +85,9 @@ function Broadcast() {
         setError('WebSocket error')
         setStatus('error')
       }
-      ws.onclose = () => {
-        if (status === 'live') setStatus('idle')
+      ws.onclose = (ev) => {
+        if (ev.code === 1008) setError(ev.reason || 'Not authorized to broadcast')
+        setStatus((s) => (s === 'live' ? 'idle' : s))
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e))
@@ -80,7 +96,7 @@ function Broadcast() {
   }
 
   function stopBroadcast() {
-    recorderRef.current?.state === 'recording' && recorderRef.current.stop()
+    if (recorderRef.current?.state === 'recording') recorderRef.current.stop()
     recorderRef.current = null
     streamRef.current?.getTracks().forEach((t) => t.stop())
     streamRef.current = null
@@ -94,9 +110,19 @@ function Broadcast() {
 
   return (
     <main style={{ fontFamily: 'system-ui', padding: '3rem', maxWidth: 640 }}>
-      <h1>Broadcast</h1>
-      <p>Status: <strong>{status}</strong>{status === 'live' && ` · ${formatDuration(elapsed)}`}</p>
+      <p style={{ color: '#666', marginBottom: 0 }}>
+        <Link to="/$slug" params={{ slug: show.slug }}>
+          ← {show.name}
+        </Link>
+      </p>
+      <h1 style={{ marginTop: '0.5rem' }}>Broadcast: {show.name}</h1>
+
+      <p>
+        Status: <strong>{status}</strong>
+        {status === 'live' && ` · ${formatDuration(elapsed)}`}
+      </p>
       {error && <p style={{ color: 'crimson' }}>Error: {error}</p>}
+
       {status === 'live' ? (
         <button onClick={stopBroadcast}>Stop</button>
       ) : (
@@ -104,6 +130,14 @@ function Broadcast() {
           {status === 'connecting' ? 'Connecting…' : 'Go Live'}
         </button>
       )}
+
+      <p style={{ color: '#666', fontSize: '0.875rem', marginTop: '2rem' }}>
+        Listeners can tune in at{' '}
+        <Link to="/$slug" params={{ slug: show.slug }}>
+          /{show.slug}
+        </Link>
+        .
+      </p>
     </main>
   )
 }

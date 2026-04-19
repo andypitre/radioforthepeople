@@ -1,5 +1,7 @@
 import { HeadContent, Outlet, Scripts, createRootRoute } from '@tanstack/react-router'
 import type { ReactNode } from 'react'
+import type { User } from 'db'
+import { fetchCurrentUser } from '../server-fns'
 
 export const Route = createRootRoute({
   head: () => ({
@@ -9,6 +11,10 @@ export const Route = createRootRoute({
       { title: 'Radio for the People' },
     ],
   }),
+  beforeLoad: async (): Promise<{ user: User | null }> => {
+    const user = await fetchCurrentUser()
+    return { user }
+  },
   component: RootComponent,
 })
 

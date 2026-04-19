@@ -20,6 +20,15 @@ importers:
       '@tanstack/react-start':
         specifier: ^1.87.0
         version: 1.167.42(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(vite@7.3.2(@types/node@22.19.17)(tsx@4.21.0))
+      db:
+        specifier: workspace:*
+        version: link:../db
+      drizzle-orm:
+        specifier: ^0.36.0
+        version: 0.36.4(@types/react@18.3.28)(postgres@3.4.9)(react@18.3.1)
+      postgres:
+        specifier: ^3.4.5
+        version: 3.4.9
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -73,9 +82,18 @@ importers:
       '@hono/node-server':
         specifier: ^1.13.5
         version: 1.19.14(hono@4.12.14)
+      db:
+        specifier: workspace:*
+        version: link:../db
+      drizzle-orm:
+        specifier: ^0.36.0
+        version: 0.36.4(@types/react@18.3.28)(postgres@3.4.9)(react@18.3.1)
       hono:
         specifier: ^4.6.9
         version: 4.12.14
+      postgres:
+        specifier: ^3.4.5
+        version: 3.4.9
       ws:
         specifier: ^8.18.0
         version: 8.20.0

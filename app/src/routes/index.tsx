@@ -1,18 +1,31 @@
-import { Link, createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/')({
   component: Home,
 })
 
 function Home() {
+  const { user } = Route.useRouteContext()
   return (
     <main style={{ fontFamily: 'system-ui', padding: '3rem', maxWidth: 640 }}>
       <h1>Radio for the People</h1>
       <p>An open, self-service community internet radio platform.</p>
-      <ul>
-        <li><Link to="/broadcast">Go Live</Link></li>
-        <li><Link to="/listen">Listen</Link></li>
-      </ul>
+
+      {user ? (
+        <>
+          <p>
+            Signed in as <strong>{user.displayName ?? user.email}</strong>.{' '}
+            <a href="/auth/logout">Sign out</a>
+          </p>
+          <p>
+            <a href="/new-show">Create a show</a>
+          </p>
+        </>
+      ) : (
+        <p>
+          <Link to="/login">Sign in</Link> to create a show and broadcast.
+        </p>
+      )}
     </main>
   )
 }

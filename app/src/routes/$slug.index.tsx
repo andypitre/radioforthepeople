@@ -1,8 +1,22 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { Link, createFileRoute, notFound } from '@tanstack/react-router'
 import { useEffect, useRef, useState } from 'react'
+import { fetchShowBySlug } from '../server-fns'
 
-export const Route = createFileRoute('/listen')({
-  component: Listen,
+export const Route = createFileRoute('/$slug/')({
+  loader: async ({ params }) => {
+    const show = await fetchShowBySlug({ data: params.slug })
+    if (!show) throw notFound()
+    return { show }
+  },
+  component: ShowPage,
+  notFoundComponent: () => (
+    <main style={{ fontFamily: 'system-ui', padding: '3rem', maxWidth: 640 }}>
+      <h1>Show not found</h1>
+      <p>
+        <Link to="/">Back home</Link>
+      </p>
+    </main>
+  ),
 })
 
 const WS_URL =
@@ -12,7 +26,11 @@ const WS_URL =
 
 type Status = 'offline' | 'connecting' | 'live'
 
-function Listen() {
+function ShowPage() {
+  const { show } = Route.useLoaderData()
+  const { user } = Route.useRouteContext()
+  const canBroadcast = show.viewerRole === 'owner' || show.viewerRole === 'cohost'
+
   const [status, setStatus] = useState<Status>('offline')
   const [error, setError] = useState<string | null>(null)
   const audioRef = useRef<HTMLAudioElement | null>(null)
@@ -45,7 +63,7 @@ function Listen() {
       } catch {}
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [show.slug])
 
   function drainQueue() {
     const sb = sourceBufferRef.current
@@ -56,7 +74,9 @@ function Listen() {
 
   function openSocket() {
     setStatus('connecting')
-    const ws = new WebSocket(`${WS_URL}/ws?role=listener`)
+    const ws = new WebSocket(
+      `${WS_URL}/ws?show=${encodeURIComponent(show.slug)}&role=listener`,
+    )
     ws.binaryType = 'arraybuffer'
     wsRef.current = ws
 
@@ -77,10 +97,32 @@ function Listen() {
 
   return (
     <main style={{ fontFamily: 'system-ui', padding: '3rem', maxWidth: 640 }}>
-      <h1>Listen</h1>
-      <p>Status: <strong>{status}</strong></p>
+      <p style={{ color: '#666', marginBottom: 0 }}>
+        <Link to="/">← Radio for the People</Link>
+      </p>
+      <h1 style={{ marginTop: '0.5rem' }}>{show.name}</h1>
+      {show.description && <p>{show.description}</p>}
+
+      <p>
+        Status: <strong>{status}</strong>
+      </p>
       {error && <p style={{ color: 'crimson' }}>Error: {error}</p>}
-      <audio ref={audioRef} controls autoPlay />
+
+      <audio ref={audioRef} controls autoPlay style={{ width: '100%' }} />
+
+      {canBroadcast && (
+        <p style={{ marginTop: '2rem' }}>
+          <Link to="/$slug/broadcast" params={{ slug: show.slug }}>
+            Broadcast this show →
+          </Link>
+        </p>
+      )}
+
+      {!user && (
+        <p style={{ color: '#666', marginTop: '2rem', fontSize: '0.875rem' }}>
+          <Link to="/login">Sign in</Link> to create your own show.
+        </p>
+      )}
     </main>
   )
 }

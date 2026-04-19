@@ -9,18 +9,26 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as ListenRouteImport } from './routes/listen'
-import { Route as BroadcastRouteImport } from './routes/broadcast'
+import { Route as NewShowRouteImport } from './routes/new-show'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as SlugRouteImport } from './routes/$slug'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SlugIndexRouteImport } from './routes/$slug.index'
+import { Route as SlugBroadcastRouteImport } from './routes/$slug.broadcast'
 
-const ListenRoute = ListenRouteImport.update({
-  id: '/listen',
-  path: '/listen',
+const NewShowRoute = NewShowRouteImport.update({
+  id: '/new-show',
+  path: '/new-show',
   getParentRoute: () => rootRouteImport,
 } as any)
-const BroadcastRoute = BroadcastRouteImport.update({
-  id: '/broadcast',
-  path: '/broadcast',
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SlugRoute = SlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -28,51 +36,90 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SlugIndexRoute = SlugIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => SlugRoute,
+} as any)
+const SlugBroadcastRoute = SlugBroadcastRouteImport.update({
+  id: '/broadcast',
+  path: '/broadcast',
+  getParentRoute: () => SlugRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/broadcast': typeof BroadcastRoute
-  '/listen': typeof ListenRoute
+  '/$slug': typeof SlugRouteWithChildren
+  '/login': typeof LoginRoute
+  '/new-show': typeof NewShowRoute
+  '/$slug/broadcast': typeof SlugBroadcastRoute
+  '/$slug/': typeof SlugIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/broadcast': typeof BroadcastRoute
-  '/listen': typeof ListenRoute
+  '/login': typeof LoginRoute
+  '/new-show': typeof NewShowRoute
+  '/$slug/broadcast': typeof SlugBroadcastRoute
+  '/$slug': typeof SlugIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/broadcast': typeof BroadcastRoute
-  '/listen': typeof ListenRoute
+  '/$slug': typeof SlugRouteWithChildren
+  '/login': typeof LoginRoute
+  '/new-show': typeof NewShowRoute
+  '/$slug/broadcast': typeof SlugBroadcastRoute
+  '/$slug/': typeof SlugIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/broadcast' | '/listen'
+  fullPaths:
+    | '/'
+    | '/$slug'
+    | '/login'
+    | '/new-show'
+    | '/$slug/broadcast'
+    | '/$slug/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/broadcast' | '/listen'
-  id: '__root__' | '/' | '/broadcast' | '/listen'
+  to: '/' | '/login' | '/new-show' | '/$slug/broadcast' | '/$slug'
+  id:
+    | '__root__'
+    | '/'
+    | '/$slug'
+    | '/login'
+    | '/new-show'
+    | '/$slug/broadcast'
+    | '/$slug/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  BroadcastRoute: typeof BroadcastRoute
-  ListenRoute: typeof ListenRoute
+  SlugRoute: typeof SlugRouteWithChildren
+  LoginRoute: typeof LoginRoute
+  NewShowRoute: typeof NewShowRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/listen': {
-      id: '/listen'
-      path: '/listen'
-      fullPath: '/listen'
-      preLoaderRoute: typeof ListenRouteImport
+    '/new-show': {
+      id: '/new-show'
+      path: '/new-show'
+      fullPath: '/new-show'
+      preLoaderRoute: typeof NewShowRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/broadcast': {
-      id: '/broadcast'
-      path: '/broadcast'
-      fullPath: '/broadcast'
-      preLoaderRoute: typeof BroadcastRouteImport
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$slug': {
+      id: '/$slug'
+      path: '/$slug'
+      fullPath: '/$slug'
+      preLoaderRoute: typeof SlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -82,13 +129,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$slug/': {
+      id: '/$slug/'
+      path: '/'
+      fullPath: '/$slug/'
+      preLoaderRoute: typeof SlugIndexRouteImport
+      parentRoute: typeof SlugRoute
+    }
+    '/$slug/broadcast': {
+      id: '/$slug/broadcast'
+      path: '/broadcast'
+      fullPath: '/$slug/broadcast'
+      preLoaderRoute: typeof SlugBroadcastRouteImport
+      parentRoute: typeof SlugRoute
+    }
   }
 }
 
+interface SlugRouteChildren {
+  SlugBroadcastRoute: typeof SlugBroadcastRoute
+  SlugIndexRoute: typeof SlugIndexRoute
+}
+
+const SlugRouteChildren: SlugRouteChildren = {
+  SlugBroadcastRoute: SlugBroadcastRoute,
+  SlugIndexRoute: SlugIndexRoute,
+}
+
+const SlugRouteWithChildren = SlugRoute._addFileChildren(SlugRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  BroadcastRoute: BroadcastRoute,
-  ListenRoute: ListenRoute,
+  SlugRoute: SlugRouteWithChildren,
+  LoginRoute: LoginRoute,
+  NewShowRoute: NewShowRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
