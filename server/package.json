@@ -5,8 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch --env-file=../.env src/index.ts",
-    "build": "tsc -p tsconfig.json",
-    "start": "node --env-file=../.env dist/index.js",
+    "start": "tsx src/index.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -15,12 +14,12 @@
     "drizzle-orm": "^0.36.0",
     "hono": "^4.6.9",
     "postgres": "^3.4.5",
+    "tsx": "^4.19.2",
     "ws": "^8.18.0"
   },
   "devDependencies": {
     "@types/node": "^22.9.0",
     "@types/ws": "^8.5.13",
-    "tsx": "^4.19.2",
     "typescript": "^5.6.3"
   }
 }

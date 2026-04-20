@@ -6,10 +6,11 @@
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
-    "start": "node dist/server/server.js",
+    "start": "node serve.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@hono/node-server": "^1.13.5",
     "@tanstack/react-router": "^1.87.0",
     "@tanstack/react-start": "^1.87.0",
     "db": "workspace:*",

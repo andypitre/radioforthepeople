@@ -1,0 +1,81 @@
+# Nexlayer deployment template for radioforthepeople.org.
+#
+# This file is committed with placeholders (__TOKEN__). The deploy
+# script reads deploy/.env.production, substitutes tokens, writes
+# deploy/nexlayer.yaml (gitignored), and calls nexlayer_deploy.
+# The filled YAML is never committed.
+#
+# Tokens:
+#   __APP_IMAGE__              e.g. registry.nexlayer.io/nexlayer-mcp/andypitre/rftp-app:v1
+#   __SERVER_IMAGE__           e.g. ...:rftp-server:v1
+#   __DB_IMAGE__               e.g. ...:rftp-db:v1
+#   __POSTGRES_PASSWORD__      admin (rftp) role password
+#   __RFTP_APP_PASSWORD__      app (rftp_app) role password
+#   __SESSION_SECRET__         random 32+ byte base64 for HMAC-signed cookies
+#   __GOOGLE_CLIENT_ID__
+#   __GOOGLE_CLIENT_SECRET__
+
+application:
+  name: radioforthepeople
+  url: radioforthepeople.org
+
+  pods:
+    # --------------------------------------------------------------
+    # App: TanStack Start (serves /, /login, /studio/*, /{slug},
+    # /auth/*, /api/*). Same origin as /ws so cookies flow to WS upgrade.
+    # --------------------------------------------------------------
+    - name: app
+      image: __APP_IMAGE__
+      path: /
+      servicePorts: [3000]
+      vars:
+        NODE_ENV: production
+        PORT: "3000"
+        HOST: 0.0.0.0
+        # rftp_app is non-superuser so RLS enforces
+        DATABASE_URL_APP: postgres://rftp_app:__RFTP_APP_PASSWORD__@postgres.pod:5432/radioforthepeople
+        # Admin URL used only by on-demand migration runs
+        DATABASE_URL: postgres://rftp:__POSTGRES_PASSWORD__@postgres.pod:5432/radioforthepeople
+        SESSION_SECRET: __SESSION_SECRET__
+        GOOGLE_CLIENT_ID: __GOOGLE_CLIENT_ID__
+        GOOGLE_CLIENT_SECRET: __GOOGLE_CLIENT_SECRET__
+        GOOGLE_REDIRECT_URI: <% URL %>/auth/google/callback
+        # Same origin, so browser connects to wss://<domain>/ws
+        VITE_WS_URL: ""
+
+    # --------------------------------------------------------------
+    # WS relay: broadcaster auth via the same session cookie.
+    # Mounted at /ws so listeners connect to wss://<domain>/ws.
+    # --------------------------------------------------------------
+    - name: server
+      image: __SERVER_IMAGE__
+      path: /ws
+      servicePorts: [1078]
+      vars:
+        NODE_ENV: production
+        SERVER_PORT: "1078"
+        SERVER_HOST: 0.0.0.0
+        DATABASE_URL_APP: postgres://rftp_app:__RFTP_APP_PASSWORD__@postgres.pod:5432/radioforthepeople
+        SESSION_SECRET: __SESSION_SECRET__
+      volumes:
+        - name: recordings
+          size: 20Gi
+          mountPath: /app/recordings
+
+    # --------------------------------------------------------------
+    # Postgres: custom image that adds the rftp_app role init script.
+    # POSTGRES_USER=rftp becomes the admin role (owns migrations).
+    # POSTGRES_DB is created on first boot.
+    # --------------------------------------------------------------
+    - name: postgres
+      image: __DB_IMAGE__
+      servicePorts: [5432]
+      vars:
+        POSTGRES_USER: rftp
+        POSTGRES_PASSWORD: __POSTGRES_PASSWORD__
+        POSTGRES_DB: radioforthepeople
+        RFTP_APP_PASSWORD: __RFTP_APP_PASSWORD__
+      volumes:
+        - name: pgdata
+          size: 20Gi
+          mountPath: /var/lib/postgresql

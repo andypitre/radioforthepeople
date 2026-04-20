@@ -13,6 +13,10 @@ build
 .env.local
 .env.*.local
 
+# Deploy: the filled YAML and production env both contain secrets
+deploy/nexlayer.yaml
+deploy/.env.production
+
 server/recordings/*
 !server/recordings/.gitkeep
 
