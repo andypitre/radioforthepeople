@@ -27,6 +27,7 @@ function StudioShow() {
   const wsRef = useRef<WebSocket | null>(null)
   const recorderRef = useRef<MediaRecorder | null>(null)
   const streamRef = useRef<MediaStream | null>(null)
+  const audioCtxRef = useRef<AudioContext | null>(null)
   const startedAtRef = useRef<number>(0)
   const tickRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
@@ -41,19 +42,50 @@ function StudioShow() {
     setError(null)
     setStatus('connecting')
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
+      const rawStream = await navigator.mediaDevices.getUserMedia({
         audio: {
           echoCancellation: false,
           noiseSuppression: false,
           autoGainControl: false,
-          // Pro gear: capture stereo and let the device sample at 48k.
-          // Without this Chrome defaults to mono, losing the second
-          // channel (e.g. turntables on the Volt's channel 2).
-          channelCount: { ideal: 2 },
+          // Grab as many channels as the interface exposes (Volt 476 has 4,
+          // some 8-input boxes have 8). Chrome clamps to what the device
+          // advertises, so `ideal: 8` is safe — interfaces with fewer
+          // channels just return what they have.
+          channelCount: { ideal: 8 },
           sampleRate: { ideal: 48000 },
         },
       })
-      streamRef.current = stream
+      streamRef.current = rawStream
+
+      // Downmix multichannel inputs to a stereo track for MediaRecorder,
+      // which only encodes 2 channels of Opus. We sum every input channel
+      // into both L and R — the broadcaster's own mixer is responsible
+      // for stereo/panning before it reaches the USB bus. If we skipped
+      // this step, Chrome would keep only channels 1+2 and silently drop
+      // everything else.
+      const trackChannels =
+        rawStream.getAudioTracks()[0]?.getSettings().channelCount ?? 2
+      let stream = rawStream
+      if (trackChannels > 2) {
+        const AudioCtx =
+          window.AudioContext ||
+          (window as unknown as { webkitAudioContext: typeof AudioContext })
+            .webkitAudioContext
+        const ctx = new AudioCtx({ sampleRate: 48000 })
+        audioCtxRef.current = ctx
+        const source = ctx.createMediaStreamSource(rawStream)
+        const splitter = ctx.createChannelSplitter(trackChannels)
+        const merger = ctx.createChannelMerger(2)
+        source.connect(splitter)
+        for (let i = 0; i < trackChannels; i++) {
+          splitter.connect(merger, i, 0)
+          splitter.connect(merger, i, 1)
+        }
+        const dest = ctx.createMediaStreamDestination()
+        merger.connect(dest)
+        stream = dest.stream
+        console.log(`[broadcast] mixing ${trackChannels} input channels → stereo`)
+      }
 
       const ws = new WebSocket(
         `${getWsUrl()}/ws?show=${encodeURIComponent(show.slug)}&role=broadcaster`,
@@ -113,6 +145,8 @@ function StudioShow() {
     recorderRef.current = null
     streamRef.current?.getTracks().forEach((t) => t.stop())
     streamRef.current = null
+    audioCtxRef.current?.close().catch(() => {})
+    audioCtxRef.current = null
     wsRef.current?.close()
     wsRef.current = null
     if (tickRef.current) clearInterval(tickRef.current)
