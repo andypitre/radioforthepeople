@@ -1,6 +1,7 @@
 import { Link, createFileRoute, notFound, redirect } from '@tanstack/react-router'
 import { useEffect, useRef, useState } from 'react'
 import { fetchShowBySlug } from '../server-fns'
+import { getWsUrl } from '../lib/ws-url'
 
 export const Route = createFileRoute('/studio/$slug')({
   loader: async ({ params }) => {
@@ -14,11 +15,6 @@ export const Route = createFileRoute('/studio/$slug')({
   },
   component: StudioShow,
 })
-
-const WS_URL =
-  typeof window !== 'undefined'
-    ? (import.meta.env.VITE_WS_URL ?? 'ws://localhost:1078')
-    : 'ws://localhost:1078'
 
 type Status = 'idle' | 'connecting' | 'live' | 'error'
 
@@ -50,46 +46,65 @@ function StudioShow() {
           echoCancellation: false,
           noiseSuppression: false,
           autoGainControl: false,
+          // Pro gear: capture stereo and let the device sample at 48k.
+          // Without this Chrome defaults to mono, losing the second
+          // channel (e.g. turntables on the Volt's channel 2).
+          channelCount: { ideal: 2 },
+          sampleRate: { ideal: 48000 },
         },
       })
       streamRef.current = stream
 
       const ws = new WebSocket(
-        `${WS_URL}/ws?show=${encodeURIComponent(show.slug)}&role=broadcaster`,
+        `${getWsUrl()}/ws?show=${encodeURIComponent(show.slug)}&role=broadcaster`,
       )
       ws.binaryType = 'arraybuffer'
       wsRef.current = ws
 
       ws.onopen = () => {
-        const recorder = new MediaRecorder(stream, {
-          mimeType: 'audio/webm;codecs=opus',
-          audioBitsPerSecond: 128_000,
-        })
-        recorderRef.current = recorder
-        recorder.ondataavailable = async (ev) => {
-          if (ev.data.size > 0 && ws.readyState === WebSocket.OPEN) {
-            ws.send(await ev.data.arrayBuffer())
+        try {
+          const recorder = new MediaRecorder(stream, {
+            mimeType: 'audio/webm;codecs=opus',
+            audioBitsPerSecond: 128_000,
+          })
+          recorderRef.current = recorder
+          recorder.ondataavailable = async (ev) => {
+            if (ev.data.size > 0 && ws.readyState === WebSocket.OPEN) {
+              ws.send(await ev.data.arrayBuffer())
+            }
           }
+          recorder.onerror = (ev) => {
+            const e = (ev as unknown as { error?: Error }).error
+            setError(`Recorder error: ${e?.message ?? 'unknown'}`)
+            stopBroadcast()
+          }
+          recorder.start(250)
+          startedAtRef.current = Date.now()
+          tickRef.current = setInterval(() => {
+            setElapsed(Math.floor((Date.now() - startedAtRef.current) / 1000))
+          }, 1000)
+          setStatus('live')
+        } catch (e) {
+          setError(e instanceof Error ? e.message : String(e))
+          stopBroadcast()
         }
-        recorder.start(250)
-        startedAtRef.current = Date.now()
-        tickRef.current = setInterval(() => {
-          setElapsed(Math.floor((Date.now() - startedAtRef.current) / 1000))
-        }, 1000)
-        setStatus('live')
       }
 
       ws.onerror = () => {
+        // Browsers fire this for transient issues too — don't tear
+        // down the working connection here. onclose will follow if
+        // it's actually dead.
         setError('WebSocket error')
-        setStatus('error')
       }
       ws.onclose = (ev) => {
         if (ev.code === 1008) setError(ev.reason || 'Not authorized to broadcast')
-        setStatus((s) => (s === 'live' ? 'idle' : s))
+        // Only clean up on actual close. Prevents closing a live WS
+        // because of a spurious onerror event.
+        stopBroadcast()
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e))
-      setStatus('error')
+      stopBroadcast()
     }
   }
 

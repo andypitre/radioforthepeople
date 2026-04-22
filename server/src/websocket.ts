@@ -50,11 +50,24 @@ function broadcastStatus(room: Room) {
   }
 }
 
+// Mark type for our WS with a liveness flag the heartbeat updates.
+type LiveWebSocket = WebSocket & { isAlive?: boolean }
+
 export function attachWebSocket(wss: WebSocketServer) {
-  wss.on('connection', async (ws, req) => {
+  wss.on('connection', async (raw, req) => {
+    const ws = raw as LiveWebSocket
     const url = new URL(req.url ?? '/', `http://${req.headers.host}`)
     const role = url.searchParams.get('role')
     const slug = url.searchParams.get('show')
+    const cookieHeader = req.headers.cookie ?? ''
+    console.log(
+      `[ws] upgrade role=${role} show=${slug} cookie_len=${cookieHeader.length} has_session=${cookieHeader.includes('rftp_session=')} origin=${req.headers.origin ?? '-'} xff=${req.headers['x-forwarded-for'] ?? '-'}`,
+    )
+
+    ws.isAlive = true
+    ws.on('pong', () => {
+      ws.isAlive = true
+    })
 
     if (!slug) {
       ws.close(1008, 'Missing show')
@@ -67,6 +80,29 @@ export function attachWebSocket(wss: WebSocketServer) {
       handleListener(ws, slug)
     }
   })
+
+  // Heartbeat: every 30s, ping every connection. Anything that didn't
+  // pong since the last tick gets terminated. Catches dead TCPs that
+  // the ingress kept alive with its own keepalives but whose client
+  // is long gone — without this, orphan broadcaster connections
+  // block legitimate reconnect attempts.
+  const interval = setInterval(() => {
+    wss.clients.forEach((client) => {
+      const w = client as LiveWebSocket
+      if (w.isAlive === false) {
+        console.log('[ws] terminating dead connection')
+        w.terminate()
+        return
+      }
+      w.isAlive = false
+      try {
+        w.ping()
+      } catch {
+        // ignore — terminate will catch it next tick
+      }
+    })
+  }, 30_000)
+  wss.on('close', () => clearInterval(interval))
 }
 
 async function handleBroadcaster(
@@ -92,8 +128,19 @@ async function handleBroadcaster(
   }
 
   const room = getOrCreateRoom(slug)
+  // Nexlayer's ingress currently duplicates each upgrade (one upgrade
+  // from the browser turns into two TCPs reaching this pod). If we
+  // close the "extra" one, that close propagates back through the
+  // ingress to the browser and kills the real WS.
+  //
+  // Strategy: the first accepted broadcaster wins; any subsequent
+  // connections for a room that already has a live broadcaster are
+  // silently ignored — no close frame, no handlers, no state change.
+  // The idle duplicate sits until the heartbeat terminates it for
+  // missing pongs. Works for both the ingress-duplication case and
+  // the legitimate "someone else is on air" case.
   if (room.broadcaster && room.broadcaster.readyState === WebSocket.OPEN) {
-    ws.close(1008, 'A broadcaster is already live')
+    console.log(`[ws] duplicate broadcaster for "${slug}" — leaving idle`)
     return
   }
   room.broadcaster = ws
@@ -120,6 +167,9 @@ async function handleBroadcaster(
 
   ws.on('close', () => {
     console.log(`[ws] broadcaster for "${slug}" disconnected`)
+    // If we've already been replaced by a newer broadcaster, the room
+    // now points at that one — don't clobber its state.
+    if (room.broadcaster !== ws) return
     room.broadcaster = null
     room.recording?.end()
     room.recording = null

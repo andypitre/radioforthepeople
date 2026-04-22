@@ -28,7 +28,7 @@ function NewShow() {
         setError(res.error)
         return
       }
-      window.location.href = `/${res.show.slug}`
+      window.location.href = `/studio/${res.show.slug}`
     } finally {
       setSubmitting(false)
     }

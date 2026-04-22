@@ -1,6 +1,7 @@
 import { Link, createFileRoute, notFound } from '@tanstack/react-router'
 import { useEffect, useRef, useState } from 'react'
 import { fetchShowBySlug } from '../server-fns'
+import { getWsUrl } from '../lib/ws-url'
 
 export const Route = createFileRoute('/$slug')({
   loader: async ({ params }) => {
@@ -18,11 +19,6 @@ export const Route = createFileRoute('/$slug')({
     </main>
   ),
 })
-
-const WS_URL =
-  typeof window !== 'undefined'
-    ? (import.meta.env.VITE_WS_URL ?? 'ws://localhost:1078')
-    : 'ws://localhost:1078'
 
 type Status = 'offline' | 'connecting' | 'live'
 
@@ -75,7 +71,7 @@ function ShowPage() {
   function openSocket() {
     setStatus('connecting')
     const ws = new WebSocket(
-      `${WS_URL}/ws?show=${encodeURIComponent(show.slug)}&role=listener`,
+      `${getWsUrl()}/ws?show=${encodeURIComponent(show.slug)}&role=listener`,
     )
     ws.binaryType = 'arraybuffer'
     wsRef.current = ws
