@@ -1,6 +1,10 @@
 import { Link, createFileRoute, notFound, redirect } from '@tanstack/react-router'
 import { useEffect, useRef, useState } from 'react'
-import { fetchShowBySlug } from '../server-fns'
+import {
+  fetchShowBySlug,
+  trackBroadcastEnded,
+  trackBroadcastStarted,
+} from '../server-fns'
 import { getWsUrl } from '../lib/ws-url'
 
 export const Route = createFileRoute('/studio/$slug')({
@@ -116,6 +120,7 @@ function StudioShow() {
             setElapsed(Math.floor((Date.now() - startedAtRef.current) / 1000))
           }, 1000)
           setStatus('live')
+          void trackBroadcastStarted({ data: show.slug }).catch(() => {})
         } catch (e) {
           setError(e instanceof Error ? e.message : String(e))
           stopBroadcast()
@@ -141,6 +146,10 @@ function StudioShow() {
   }
 
   function stopBroadcast() {
+    const wasLive = recorderRef.current?.state === 'recording'
+    const durationSec = wasLive
+      ? Math.floor((Date.now() - startedAtRef.current) / 1000)
+      : 0
     if (recorderRef.current?.state === 'recording') recorderRef.current.stop()
     recorderRef.current = null
     streamRef.current?.getTracks().forEach((t) => t.stop())
@@ -153,6 +162,9 @@ function StudioShow() {
     tickRef.current = null
     setElapsed(0)
     setStatus('idle')
+    if (wasLive) {
+      void trackBroadcastEnded({ data: { slug: show.slug, durationSec } }).catch(() => {})
+    }
   }
 
   return (

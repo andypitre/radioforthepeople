@@ -16,6 +16,7 @@ import {
   verifySession,
 } from './session'
 import { db, withAppUser } from './db'
+import { identify, track } from './tracking'
 
 function redirect(location: string, extraHeaders: HeadersInit = {}): Response {
   return new Response(null, {
@@ -65,13 +66,13 @@ export async function handleAuthGoogleCallback(req: Request): Promise<Response> 
 
   // Step 1 (no user context): look up or create by google_id.
   // users_select and users_insert both allow this without a session GUC.
-  const userId = await withAppUser(db(), null, async (tx) => {
+  const { userId, isNewUser } = await withAppUser(db(), null, async (tx) => {
     const existing = await tx
       .select({ id: users.id })
       .from(users)
       .where(eq(users.googleId, info.id))
       .limit(1)
-    if (existing[0]) return existing[0].id
+    if (existing[0]) return { userId: existing[0].id, isNewUser: false }
     const inserted = await tx
       .insert(users)
       .values({
@@ -81,7 +82,7 @@ export async function handleAuthGoogleCallback(req: Request): Promise<Response> 
         avatarUrl: info.picture ?? null,
       })
       .returning({ id: users.id })
-    return inserted[0]!.id
+    return { userId: inserted[0]!.id, isNewUser: true }
   })
 
   // Step 2 (user context): refresh profile fields. users_update policy
@@ -97,6 +98,17 @@ export async function handleAuthGoogleCallback(req: Request): Promise<Response> 
       })
       .where(eq(users.id, userId))
   })
+
+  // Mirror to Simple Product: always identify (safe upsert on every
+  // login, keeps name/email fresh there too), and emit signed_up once
+  // for brand-new users so we can distinguish signups from returning
+  // logins in SP's event feed.
+  identify({ id: userId, email: info.email, displayName: info.name ?? null })
+  if (isNewUser) {
+    track('signed_up', { id: userId, email: info.email })
+  } else {
+    track('signed_in', { id: userId, email: info.email })
+  }
 
   const token2 = signSession(userId)
   const headers = new Headers({ Location: '/studio' })

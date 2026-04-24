@@ -1,6 +1,7 @@
 import { and, eq } from 'drizzle-orm'
 import { shows, showMembers, type Show } from 'db'
 import { db, withAppUser } from './db'
+import { track } from './tracking'
 
 const RESERVED_SLUGS = new Set([
   'admin',
@@ -69,6 +70,7 @@ export async function createShow(
       })
       return created
     })
+    track('show_created', { id: userId }, { slug: show.slug, name: show.name })
     return { ok: true, show }
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err)

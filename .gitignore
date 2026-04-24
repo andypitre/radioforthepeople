@@ -21,3 +21,6 @@ server/recordings/*
 !server/recordings/.gitkeep
 
 pg-data/
+
+# DB dumps contain user data — keep local-only
+backups/
