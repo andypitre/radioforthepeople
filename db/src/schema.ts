@@ -2,6 +2,8 @@ import { sql } from 'drizzle-orm'
 import {
   pgTable,
   text,
+  time,
+  integer,
   timestamp,
   uuid,
   primaryKey,
@@ -22,6 +24,12 @@ export const users = pgTable('users', {
     .defaultNow(),
 })
 
+export const scheduleCadence = pgEnum('schedule_cadence', [
+  'daily',
+  'weekly',
+  'monthly',
+])
+
 export const shows = pgTable('shows', {
   id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
   slug: text('slug').notNull().unique(),
@@ -30,6 +38,15 @@ export const shows = pgTable('shows', {
   createdBy: uuid('created_by')
     .notNull()
     .references(() => users.id, { onDelete: 'restrict' }),
+  // Optional schedule. App-layer validates internal consistency
+  // (weekly → dayOfWeek set, monthly → dayOfMonth set, etc).
+  // Nullable everywhere because most shows won't set this — and we
+  // want to learn how often it's filled in.
+  scheduleCadence: scheduleCadence('schedule_cadence'),
+  scheduleDayOfWeek: integer('schedule_day_of_week'),
+  scheduleDayOfMonth: integer('schedule_day_of_month'),
+  scheduleTime: time('schedule_time'),
+  scheduleTimezone: text('schedule_timezone'),
   createdAt: timestamp('created_at', { withTimezone: true })
     .notNull()
     .defaultNow(),

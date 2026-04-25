@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import Hls from 'hls.js'
 import { fetchShowBySlug } from '../server-fns'
 import { getHttpServerUrl } from '../lib/ws-url'
+import { formatSchedule } from '../lib/schedule'
 
 export const Route = createFileRoute('/$slug')({
   loader: async ({ params }) => {
@@ -111,6 +112,11 @@ function ShowPage() {
       </p>
       <h1 style={{ marginTop: '0.5rem' }}>{show.name}</h1>
       {show.description && <p>{show.description}</p>}
+      {formatSchedule(show) && (
+        <p style={{ color: '#444', fontStyle: 'italic' }}>
+          {formatSchedule(show)}
+        </p>
+      )}
 
       <p>
         Status: <strong>{status === 'live' && !ready ? 'connecting…' : status}</strong>
