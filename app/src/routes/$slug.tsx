@@ -31,6 +31,7 @@ function ShowPage() {
 
   const [status, setStatus] = useState<Status>('offline')
   const [ready, setReady] = useState(false)
+  const [playing, setPlaying] = useState(false)
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
   // Build the HLS playlist URL once we're in the browser. Same-origin
@@ -51,8 +52,13 @@ function ShowPage() {
     if (!audio || !hlsUrl || status !== 'live') return
 
     setReady(false)
+    setPlaying(false)
     const onCanPlay = () => setReady(true)
+    const onPlay = () => setPlaying(true)
+    const onPause = () => setPlaying(false)
     audio.addEventListener('canplay', onCanPlay)
+    audio.addEventListener('play', onPlay)
+    audio.addEventListener('pause', onPause)
 
     // Order matters: prefer hls.js where supported (Chrome/Firefox/etc),
     // fall back to native-HLS only on browsers without MSE (iOS Safari).
@@ -78,10 +84,24 @@ function ShowPage() {
 
     return () => {
       audio.removeEventListener('canplay', onCanPlay)
+      audio.removeEventListener('play', onPlay)
+      audio.removeEventListener('pause', onPause)
       setReady(false)
+      setPlaying(false)
       cleanup()
     }
   }, [hlsUrl, status])
+
+  function togglePlay() {
+    const audio = audioRef.current
+    if (!audio) return
+    if (audio.paused) {
+      const p = audio.play()
+      if (p) p.catch(() => {})
+    } else {
+      audio.pause()
+    }
+  }
 
   // Poll the playlist for liveness. The server returns 404 when the
   // broadcaster is offline (the playlist file gets cleaned up shortly
@@ -122,16 +142,29 @@ function ShowPage() {
         Status: <strong>{status === 'live' && !ready ? 'connecting…' : status}</strong>
       </p>
 
-      <audio
-        ref={audioRef}
-        controls
-        autoPlay
+      {/* Hidden — hls.js needs a real <audio> element to attach to,
+          but we don't want the native progress bar / scrubber for
+          a live stream you can't seek. Custom button below. */}
+      <audio ref={audioRef} autoPlay style={{ display: 'none' }} />
+
+      <button
+        type="button"
+        onClick={togglePlay}
+        disabled={status !== 'live' || !ready}
         style={{
-          width: '100%',
-          opacity: ready ? 1 : 0.4,
-          pointerEvents: ready ? 'auto' : 'none',
+          padding: '0.75rem 2rem',
+          fontSize: '1rem',
+          fontFamily: 'inherit',
+          background: '#111',
+          color: 'white',
+          border: 'none',
+          borderRadius: 4,
+          cursor: status === 'live' && ready ? 'pointer' : 'not-allowed',
+          opacity: status === 'live' && ready ? 1 : 0.4,
         }}
-      />
+      >
+        {playing ? '⏸ Pause' : '▶ Play'}
+      </button>
 
       {canBroadcast && (
         <p style={{ marginTop: '2rem' }}>
