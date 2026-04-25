@@ -18,3 +18,17 @@ export function getWsUrl(): string {
   const scheme = protocol === 'https:' ? 'wss:' : 'ws:'
   return `${scheme}//${host}`
 }
+
+// HTTP base for the same server pod that serves WS. Used for HLS
+// playback (the listener page hits /ws/hls/:slug/:file). In production
+// this is same-origin (path "/ws" routes to the server pod); in local
+// dev, peel an http(s):// URL out of VITE_WS_URL.
+export function getHttpServerUrl(): string {
+  if (typeof window === 'undefined') return ''
+  const { hostname } = window.location
+  if (hostname === 'localhost' || hostname === '127.0.0.1') {
+    const envUrl = import.meta.env.VITE_WS_URL
+    if (envUrl) return envUrl.replace(/^ws/, 'http')
+  }
+  return ''
+}

@@ -29,6 +29,9 @@ importers:
       drizzle-orm:
         specifier: ^0.36.0
         version: 0.36.4(@types/react@18.3.28)(postgres@3.4.9)(react@18.3.1)
+      hls.js:
+        specifier: ^1.6.16
+        version: 1.6.16
       postgres:
         specifier: ^3.4.5
         version: 3.4.9
@@ -1262,6 +1265,9 @@ packages:
     peerDependenciesMeta:
       crossws:
         optional: true
+
+  hls.js@1.6.16:
+    resolution: {integrity: sha512-VSIRpLfRwlAAdGL4wiTucx2ScRipo0ed1FBatWkyt832jC4CReKstga6yIhYVwGu9LOBjuX9wzmRMeQdBJtzEA==}
 
   hono@4.12.14:
     resolution: {integrity: sha512-am5zfg3yu6sqn5yjKBNqhnTX7Cv+m00ox+7jbaKkrLMRJ4rAdldd1xPd/JzbBWspqaQv6RSTrgFN95EsfhC+7w==}
@@ -2574,6 +2580,8 @@ snapshots:
     dependencies:
       rou3: 0.8.1
       srvx: 0.11.15
+
+  hls.js@1.6.16: {}
 
   hono@4.12.14: {}
 

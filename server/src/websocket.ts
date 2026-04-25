@@ -3,6 +3,7 @@ import { createWriteStream, mkdirSync, type WriteStream } from 'node:fs'
 import { resolve } from 'node:path'
 import { WebSocket, type WebSocketServer } from 'ws'
 import { canBroadcast, getUserIdFromHeaders } from './auth.js'
+import { startHls, stopHls, type HlsProcess } from './hls.js'
 
 const RECORDINGS_DIR = resolve(process.cwd(), 'recordings')
 
@@ -15,6 +16,10 @@ type Room = {
   // First MediaRecorder chunk carries the WebM init segment — new listeners
   // that join mid-broadcast need it to decode anything.
   initChunk: Buffer | null
+  // ffmpeg subprocess transcoding the live WebM/Opus stream into HLS
+  // (AAC fMP4 + .m3u8) on disk so iOS Safari and any other client
+  // without MediaSource can play via a plain <audio> tag.
+  ffmpeg: HlsProcess | null
 }
 
 const rooms = new Map<string, Room>()
@@ -29,6 +34,7 @@ function getOrCreateRoom(slug: string): Room {
       recording: null,
       recordingPath: null,
       initChunk: null,
+      ffmpeg: null,
     }
     rooms.set(slug, room)
   }
@@ -152,6 +158,7 @@ async function handleBroadcaster(
     `${new Date().toISOString().replace(/[:.]/g, '-')}.webm`,
   )
   room.recording = createWriteStream(room.recordingPath)
+  room.ffmpeg = startHls(slug)
   console.log(`[ws] broadcaster for "${slug}" connected → ${room.recordingPath}`)
   broadcastStatus(room)
 
@@ -160,6 +167,16 @@ async function handleBroadcaster(
     const chunk = data as Buffer
     if (!room.initChunk) room.initChunk = chunk
     room.recording?.write(chunk)
+    // Tee the same chunk to ffmpeg's stdin for HLS transcoding. Wrap the
+    // write in try/catch because if ffmpeg has died the stdin write throws
+    // EPIPE and we don't want that to kill the broadcast for everyone.
+    if (room.ffmpeg) {
+      try {
+        room.ffmpeg.stdin.write(chunk)
+      } catch (err) {
+        console.error(`[ws] ffmpeg stdin write failed for "${slug}"`, err)
+      }
+    }
     for (const l of room.listeners) {
       if (l.readyState === WebSocket.OPEN) l.send(chunk, { binary: true })
     }
@@ -175,6 +192,10 @@ async function handleBroadcaster(
     room.recording = null
     room.recordingPath = null
     room.initChunk = null
+    if (room.ffmpeg) {
+      stopHls(slug, room.ffmpeg)
+      room.ffmpeg = null
+    }
     broadcastStatus(room)
     for (const l of room.listeners) {
       if (l.readyState === WebSocket.OPEN) l.close(1000, 'Stream ended')

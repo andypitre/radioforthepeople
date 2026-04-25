@@ -30,6 +30,9 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV SERVER_PORT=1078
 ENV SERVER_HOST=0.0.0.0
+# ffmpeg transcodes WebM/Opus → HLS (AAC fMP4) for mobile listeners
+# (iOS Safari, etc.) that don't have MediaSource for WebM.
+RUN apk add --no-cache ffmpeg
 COPY --from=pkg /out/package.json ./package.json
 COPY --from=pkg /out/node_modules ./node_modules
 COPY --from=pkg /out/src ./src
