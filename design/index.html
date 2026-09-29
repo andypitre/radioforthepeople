@@ -1,0 +1,837 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<title>Radio for the People</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
+<style>
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+
+/* Layout: the site is one Braun-style receiver. A single device panel is the hero; everything below is quiet
+   grey ground with hairline rules, like the back of a product manual. Orange is reserved for "live". */
+:root {
+  /* Dieter Rams palettes DR01 + DR06 */
+  --ground: #E9E7E1;
+  --panel: #D9D2C6;
+  --key: #EFECE6;
+  --ink: #261201;
+  --ink-2: #736356;
+  --line: #BFB1A8;
+  --hole: #1C1109;
+  --orange: #ED3F1C;
+  --green: #736B1E;
+  --rim: #1C1109;
+  --shadow: rgba(38, 18, 1, .2);
+  --hi: rgba(255, 255, 255, .55);
+
+  --display: "Schibsted Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --body: "Schibsted Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --mono: "DM Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #15110D; --panel: #221B15; --key: #2C241D; --ink: #EDE6DA; --ink-2: #A8998C;
+    --line: #3F352D; --hole: #070504; --orange: #F14A26; --green: #8E8530; --rim: #000;
+    --shadow: rgba(0, 0, 0, .55); --hi: rgba(255, 255, 255, .05); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #15110D; --panel: #221B15; --key: #2C241D; --ink: #EDE6DA; --ink-2: #A8998C;
+    --line: #3F352D; --hole: #070504; --orange: #F14A26; --green: #8E8530; --rim: #000;
+    --shadow: rgba(0, 0, 0, .55); --hi: rgba(255, 255, 255, .05); color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--ground); color: var(--ink);
+  font-family: var(--body); font-size: 16px; line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+.page { max-width: 1120px; margin: 0 auto; padding-inline: 24px; padding-block: 0 48px; }
+@media (max-width: 560px) { .page { padding-inline: 16px; } }
+
+a { color: inherit; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--orange); outline-offset: 3px; }
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.label {
+  font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2);
+}
+
+/* ---------- header ---------- */
+.top {
+  display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
+  padding-block: 22px; border-bottom: 1px solid var(--line);
+}
+.brand { display: flex; align-items: center; gap: 12px; text-decoration: none; margin-right: auto; }
+.brand svg { width: 44px; height: 44px; flex: none; }
+.wordmark { font-family: var(--display); font-weight: 600; font-size: 18px; letter-spacing: -.01em; }
+.top nav { display: flex; gap: 20px; }
+.top nav a { text-decoration: none; font-size: 15px; color: var(--ink-2); }
+.top nav a:hover { color: var(--ink); }
+.livecount { display: flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 12px; color: var(--ink-2); }
+.dot { width: 7px; height: 7px; border-radius: 50%; background: var(--orange); display: inline-block; }
+@media (max-width: 640px) { .livecount { display: none; } .top nav { gap: 14px; } }
+
+/* ---------- hero ---------- */
+.hero { padding-block: 56px 24px; display: grid; gap: 36px; }
+.intro { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 32px; align-items: end; }
+h1 {
+  font-family: var(--display); font-weight: 600; font-size: clamp(2.3rem, 5.4vw, 4rem);
+  line-height: 1; letter-spacing: -.035em; margin: 0; text-wrap: balance;
+}
+.intro p { margin: 0; color: var(--ink-2); max-width: 40ch; font-size: 17px; }
+@media (max-width: 760px) { .intro { grid-template-columns: 1fr; gap: 16px; } }
+
+/* ---------- the receiver ---------- */
+.device {
+  background: var(--panel); border: 0; border-radius: 22px;
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 44px;
+  padding: 36px;
+}
+@media (max-width: 820px) { .device { grid-template-columns: 1fr; padding: 22px; gap: 28px; } }
+.grille-wrap { position: relative; aspect-ratio: 1; max-width: 100%; width: 100%; max-height: 460px; justify-self: center; align-self: center; }
+@media (max-width: 820px) { .grille-wrap { max-width: 340px; } }
+#grille { width: 100%; height: 100%; display: block; }
+
+.controls { display: flex; flex-direction: column; gap: 22px; min-width: 0; }
+.device-foot {
+  grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: baseline; gap: 16px;
+  font-family: var(--display); font-weight: 600; font-size: clamp(17px, 2.2vw, 22px); letter-spacing: -.01em;
+  margin-top: -8px;
+}
+.badge { font-family: var(--display); font-weight: 600; font-size: 14px; letter-spacing: -.01em; }
+
+.display {
+  border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+  padding-block: 18px; display: grid; grid-template-columns: auto 1fr; gap: 6px 20px; align-items: end;
+}
+.readout { font-family: var(--mono); font-size: clamp(44px, 6vw, 64px); line-height: .9; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
+.readout .unit { font-size: 13px; letter-spacing: .06em; margin-left: 6px; color: var(--ink-2); }
+.lamps { display: flex; gap: 16px; align-items: center; justify-content: flex-end; padding-bottom: 4px; }
+.lamp { display: flex; align-items: center; gap: 7px; font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); }
+.lamp::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--line); transition: background .2s; }
+.lamp.lit { color: var(--ink); }
+.lamp.lit::before { background: var(--orange); }
+.signal { display: flex; gap: 3px; align-items: flex-end; height: 16px; }
+.signal i { width: 4px; background: var(--line); border-radius: 1px; transition: background .15s; }
+.signal i:nth-child(1) { height: 20%; } .signal i:nth-child(2) { height: 40%; } .signal i:nth-child(3) { height: 60%; }
+.signal i:nth-child(4) { height: 80%; } .signal i:nth-child(5) { height: 100%; }
+.signal i.on { background: var(--ink); }
+.now { grid-column: 1 / -1; min-width: 0; padding-top: 10px; }
+.show { font-family: var(--display); font-weight: 600; font-size: 22px; letter-spacing: -.02em; line-height: 1.2; }
+.meta { color: var(--ink-2); font-size: 14px; }
+
+/* dial */
+.dial { position: relative; height: 78px; user-select: none; touch-action: pan-y; border-radius: 6px; }
+.dial:focus-within { outline: 2px solid var(--orange); outline-offset: 6px; }
+.dial .markers, .dial .ticks, .dial .labels { position: absolute; left: 0; right: 0; }
+.markers { top: 0; height: 12px; }
+.markers span { position: absolute; top: 1px; width: 10px; height: 10px; margin-left: -5px; border-radius: 50%; background: var(--c); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 75%, var(--ink)); }
+.ticks { top: 20px; height: 28px; border-bottom: 1px solid var(--ink-2); }
+.ticks span { position: absolute; bottom: 0; width: 1px; height: 9px; background: var(--ink-2); }
+.ticks span.major { height: 20px; background: var(--ink); }
+.labels { top: 54px; height: 16px; }
+.labels span { position: absolute; transform: translateX(-50%); font-family: var(--mono); font-size: 11px; color: var(--ink-2); }
+.needle { position: absolute; top: -4px; height: 58px; width: 2px; margin-left: -1px; background: var(--orange); border-radius: 1px; pointer-events: none; }
+.needle::after { content: ""; position: absolute; left: -4px; top: -2px; width: 10px; height: 10px; border-radius: 50%; background: var(--orange); }
+#tuner {
+  position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: ew-resize;
+  -webkit-appearance: none; appearance: none; background: transparent;
+}
+#tuner::-webkit-slider-thumb { -webkit-appearance: none; width: 2px; height: 78px; }
+#tuner::-moz-range-thumb { width: 2px; height: 78px; border: 0; }
+
+/* preset keys: round coloured buttons, label printed above, as on the DR panels */
+.keys { display: grid; grid-template-columns: repeat(auto-fit, minmax(54px, 1fr)); gap: 14px 6px; justify-items: center; }
+.key {
+  display: grid; justify-items: center; gap: 10px; background: none; border: 0; padding: 0; cursor: pointer;
+  font-family: var(--display); font-weight: 600; font-size: 11px; letter-spacing: .02em; color: var(--ink-2);
+}
+.key .cap {
+  width: 42px; height: 42px; border-radius: 50%;
+  background: var(--c); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 75%, var(--ink));
+  outline: 2px solid transparent; outline-offset: 3px; transition: outline-color .12s;
+}
+.key:hover .cap { outline-color: var(--line); }
+.key[aria-pressed="true"] { color: var(--ink); }
+.key[aria-pressed="true"] .cap { outline-color: var(--ink); }
+.key .led { width: 5px; height: 5px; border-radius: 50%; background: transparent; margin-top: -4px; }
+.key[aria-pressed="true"] .led { background: var(--orange); }
+
+.transport { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+.power {
+  width: 64px; height: 64px; border-radius: 50%; border: 1px solid var(--line); background: var(--key);
+  display: grid; place-items: center; cursor: pointer; flex: none;
+  transition: background .15s, border-color .15s;
+}
+.power svg { width: 22px; height: 22px; fill: var(--ink); }
+.power[aria-pressed="true"] { background: var(--orange); border-color: var(--orange); }
+.power[aria-pressed="true"] svg { fill: #fff; }
+.power .i-stop { display: none; }
+.power[aria-pressed="true"] .i-play { display: none; }
+.power[aria-pressed="true"] .i-stop { display: block; }
+.transport-text { display: grid; gap: 2px; margin-right: auto; }
+.transport-text strong { font-weight: 600; font-size: 15px; }
+.transport-text span { font-size: 13px; color: var(--ink-2); }
+.vol { display: flex; align-items: center; gap: 10px; }
+input[type="range"].slim { -webkit-appearance: none; appearance: none; width: 120px; height: 20px; background: transparent; cursor: pointer; }
+input[type="range"].slim::-webkit-slider-runnable-track { height: 2px; background: var(--ink-2); }
+input[type="range"].slim::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; margin-top: -6px; border-radius: 50%; background: var(--key); border: 1px solid var(--ink-2); }
+input[type="range"].slim::-moz-range-track { height: 2px; background: var(--ink-2); }
+input[type="range"].slim::-moz-range-thumb { width: 12px; height: 12px; border-radius: 50%; background: var(--key); border: 1px solid var(--ink-2); }
+
+.note { margin: 0; font-size: 13px; color: var(--ink-2); }
+
+/* ---------- sections ---------- */
+section.block { padding-block: 64px 8px; }
+.block-head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; flex-wrap: wrap; border-bottom: 1px solid var(--ink); padding-bottom: 12px; }
+h2 { font-family: var(--display); font-weight: 600; font-size: clamp(1.6rem, 3vw, 2.1rem); letter-spacing: -.025em; line-height: 1.1; margin: 0; text-wrap: balance; }
+
+.rows { list-style: none; margin: 0; padding: 0; }
+.rows li {
+  display: grid; grid-template-columns: 104px minmax(0, 1.4fr) minmax(0, 1fr) 110px 84px; gap: 16px; align-items: center;
+  padding-block: 16px; border-bottom: 1px solid var(--line);
+}
+.rows .f { display: flex; align-items: center; gap: 10px; font-family: var(--mono); font-size: 20px; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.rows .t { font-weight: 600; font-size: 17px; letter-spacing: -.01em; }
+.rows .h { font-size: 14px; color: var(--ink-2); }
+.rows .k { font-size: 14px; color: var(--ink-2); }
+.rows .n { font-family: var(--mono); font-size: 13px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.rows li.mine .f { color: var(--orange); }
+.swatch { width: 12px; height: 12px; border-radius: 50%; background: var(--c); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 75%, var(--ink)); flex: none; }
+.you { font-family: var(--mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--orange); margin-left: 8px; }
+.btn {
+  background: var(--key); border: 1px solid var(--line); border-radius: 5px; padding: 8px 14px; font-size: 14px; cursor: pointer;
+  transition: background .12s, color .12s;
+}
+.btn:hover { border-color: var(--ink-2); }
+.btn:active, .btn[aria-pressed="true"] { background: var(--ink); color: var(--panel); border-color: var(--ink); }
+.btn[aria-pressed="true"] { border-color: var(--ink-2); }
+@media (max-width: 760px) {
+  .rows li { grid-template-columns: 76px minmax(0, 1fr) auto; gap: 4px 14px; }
+  .rows .f { font-size: 16px; gap: 6px; grid-row: span 2; align-self: start; padding-top: 2px; }
+  .rows .k { display: none; }
+  .rows .n { grid-column: 2; }
+  .rows .btn { grid-column: 3; grid-row: 1 / span 2; }
+}
+
+/* tonight */
+.sched li { grid-template-columns: 104px minmax(0, 1.4fr) minmax(0, 1.2fr) 120px; }
+.sched .f { font-size: 18px; }
+@media (max-width: 760px) {
+  .sched li { grid-template-columns: 64px minmax(0, 1fr) auto; }
+  .sched .k { display: block; grid-column: 2; }
+  .sched .btn { grid-row: 1 / span 3; }
+}
+
+/* host console */
+.host { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 48px; padding-top: 28px; }
+@media (max-width: 860px) { .host { grid-template-columns: 1fr; gap: 28px; } }
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 22px; align-content: start; }
+.steps li { display: grid; grid-template-columns: 32px 1fr; gap: 12px; }
+.steps .num { font-family: var(--mono); font-size: 13px; color: var(--ink-2); padding-top: 3px; }
+.steps strong { display: block; font-size: 17px; font-weight: 600; letter-spacing: -.01em; }
+.steps p { margin: 2px 0 0; color: var(--ink-2); font-size: 15px; max-width: 38ch; }
+
+.console {
+  background: var(--panel); border: 0; border-radius: 18px; padding: 26px;
+  display: grid; gap: 20px;
+}
+.console-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.fields { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.fields .wide { grid-column: 1 / -1; }
+@media (max-width: 520px) { .fields { grid-template-columns: 1fr; } }
+.field { display: grid; gap: 6px; min-width: 0; }
+.field input, .field select {
+  font: inherit; font-size: 15px; color: var(--ink); background: var(--key); border: 1px solid var(--line);
+  border-radius: 6px; padding: 10px 12px; width: 100%;
+}
+.meter-row { display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: center; }
+.meter { display: grid; grid-template-columns: repeat(24, 1fr); gap: 3px; height: 14px; }
+.meter i { background: var(--line); border-radius: 1px; }
+.meter i.on { background: var(--ink); }
+.meter i.on.hot { background: var(--orange); }
+.meter-note { grid-column: 1 / -1; font-size: 13px; color: var(--ink-2); margin: 0; }
+.golive-row { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: 20px; }
+.golive {
+  background: var(--ink); color: var(--panel); border: 0; border-radius: 999px; padding: 14px 26px; font-weight: 600; font-size: 16px; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 10px;
+}
+.golive::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--orange); }
+.golive.live { background: var(--orange); color: #fff; }
+.golive.live::before { background: #fff; }
+.live-stats { display: flex; gap: 22px; font-family: var(--mono); font-size: 13px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.live-stats b { color: var(--ink); font-weight: 500; }
+.live-msg { margin: 0; font-size: 14px; color: var(--ink-2); flex-basis: 100%; }
+.live-msg button { background: none; border: 0; padding: 0; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; color: var(--ink); font-size: 14px; }
+.err { color: var(--orange); }
+
+/* principles */
+.principles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; padding-top: 28px; }
+@media (max-width: 760px) { .principles { grid-template-columns: 1fr; gap: 22px; } }
+.principles h3 { margin: 0 0 6px; font-size: 19px; font-weight: 600; letter-spacing: -.015em; }
+.principles p { margin: 0; color: var(--ink-2); font-size: 15px; max-width: 34ch; }
+
+footer { margin-top: 72px; padding-top: 18px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; font-size: 13px; color: var(--ink-2); }
+footer .brand { margin: 0; }
+footer .brand svg { width: 32px; height: 32px; }
+footer .wordmark { font-size: 14px; color: var(--ink); }
+
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<div class="page">
+  <header class="top">
+    <a class="brand" href="#listen" aria-label="radio for the people, home">
+      <svg class="logo" viewBox="-44 -44 88 88" aria-hidden="true"></svg>
+      <span class="wordmark">radio for the people</span>
+    </a>
+    <nav aria-label="Main">
+      <a href="#listen">Listen</a>
+      <a href="#tonight">Tonight</a>
+      <a href="#host">Go on air</a>
+    </nav>
+    <span class="livecount"><i class="dot"></i><span id="liveCount">6</span>&nbsp;shows on air</span>
+  </header>
+
+  <section id="listen" class="hero">
+    <div class="intro">
+      <h1>Radio made by the people next door.</h1>
+      <p>Live shows hosted by anyone with a microphone. Turn the dial to hear who is on air right now, or start your own show tonight.</p>
+    </div>
+
+    <div class="device">
+      <div class="grille-wrap"><canvas id="grille" role="img" aria-label="Speaker grille. It moves with the sound when the radio is on."></canvas></div>
+
+      <div class="controls">
+        <div class="display" aria-live="polite">
+          <div class="readout"><span id="freq">98.9</span><span class="unit">MHz</span></div>
+          <div class="lamps">
+            <span class="signal" id="signal" aria-label="Signal strength"><i></i><i></i><i></i><i></i><i></i></span>
+            <span class="lamp" id="onairLamp">On air</span>
+          </div>
+          <div class="now">
+            <div class="show" id="showName">Tape Loop Club</div>
+            <div class="meta" id="showMeta">Jun Park · Seoul</div>
+          </div>
+        </div>
+
+        <div class="dial" id="dial">
+          <div class="markers" id="markers"></div>
+          <div class="ticks" id="ticks"></div>
+          <div class="labels" id="labels"></div>
+          <div class="needle" id="needle"></div>
+          <input type="range" id="tuner" min="87.5" max="108" step="0.1" value="98.9" aria-label="Tuning dial, megahertz">
+        </div>
+
+        <div class="keys" id="keys" role="group" aria-label="Stations on air"></div>
+
+        <div class="transport">
+          <button class="power" id="power" aria-pressed="false" aria-label="Listen">
+            <svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>
+            <svg class="i-stop" viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="1"/></svg>
+          </button>
+          <div class="transport-text">
+            <strong id="transportTitle">Press to listen</strong>
+            <span id="transportSub">Then drag the dial or press a station key.</span>
+          </div>
+          <label class="vol label" for="volume">Vol <input class="slim" type="range" id="volume" min="0" max="1" step="0.01" value="0.7"></label>
+        </div>
+      </div>
+      <div class="device-foot"><span>radio for the people</span><span>RP01</span></div>
+    </div>
+    <p class="note">Example stations for this prototype. The sound is generated in your browser so you can feel the tuning.</p>
+  </section>
+
+  <section class="block" aria-labelledby="onair-h">
+    <div class="block-head">
+      <h2 id="onair-h">On air now</h2>
+      <span class="label" id="totalListeners">— listening</span>
+    </div>
+    <ul class="rows" id="onairList"></ul>
+  </section>
+
+  <section class="block" id="tonight" aria-labelledby="tonight-h">
+    <div class="block-head">
+      <h2 id="tonight-h">Later tonight</h2>
+      <span class="label">Times in your local zone</span>
+    </div>
+    <ul class="rows sched" id="schedList"></ul>
+  </section>
+
+  <section class="block" id="host" aria-labelledby="host-h">
+    <div class="block-head">
+      <h2 id="host-h">Host your own show</h2>
+      <span class="label">Free · no approval queue</span>
+    </div>
+    <div class="host">
+      <ol class="steps">
+        <li><span class="num">1</span><div><strong>Name your show</strong><p>A title and a line about what people will hear. You can change both later.</p></div></li>
+        <li><span class="num">2</span><div><strong>Check your mic</strong><p>Any laptop or phone mic works. Talk for a few seconds and watch the level.</p></div></li>
+        <li><span class="num">3</span><div><strong>Go on air</strong><p>Your show gets its own spot on the dial for as long as you are live. When you stop, the frequency goes back to the pool.</p></div></li>
+      </ol>
+
+      <form class="console" id="console" novalidate>
+        <div class="console-top">
+          <span class="badge">Broadcast desk</span>
+          <span class="lamp" id="deskLamp">On air</span>
+        </div>
+        <div class="fields">
+          <label class="field"><span class="label">Show name</span><input id="fShow" value="Porch Light" autocomplete="off"></label>
+          <label class="field"><span class="label">Host</span><input id="fHost" value="You" autocomplete="off"></label>
+          <label class="field wide"><span class="label">What people will hear</span><input id="fAbout" value="Records from the shoebox, and whoever calls in" autocomplete="off"></label>
+        </div>
+        <div class="meter-row">
+          <button type="button" class="btn" id="micBtn">Check mic</button>
+          <div class="meter" id="meter" aria-hidden="true"></div>
+          <p class="meter-note" id="meterNote">In the app this shows your real input level. Here it is simulated.</p>
+        </div>
+        <div class="golive-row">
+          <button type="submit" class="golive" id="goLive">Go on air</button>
+          <div class="live-stats"><span>Time <b id="liveTime">00:00:00</b></span><span>Listening <b id="liveListeners">0</b></span></div>
+          <p class="live-msg" id="liveMsg">Your show will appear on the dial above as soon as you are live.</p>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <section class="block" aria-labelledby="why-h">
+    <div class="block-head">
+      <h2 id="why-h">Less, but better radio</h2>
+      <span class="label">How it works</span>
+    </div>
+    <div class="principles">
+      <div><h3>A dial, not a feed</h3><p>No algorithm picks what you hear. Every live show sits on one dial, and you turn it.</p></div>
+      <div><h3>Anyone can go on air</h3><p>A name, a microphone and an evening. Shows are live and hosted by people, never generated.</p></div>
+      <div><h3>Live, then gone</h3><p>A show happens once, for whoever tuned in. Hosts can choose to keep a recording for their own listeners.</p></div>
+    </div>
+  </section>
+
+  <footer>
+    <a class="brand" href="#listen" aria-label="Back to the top">
+      <svg class="logo" viewBox="-44 -44 88 88" aria-hidden="true"></svg>
+      <span class="wordmark">radio for the people</span>
+    </a>
+    <span>radioforthepeople.org · design prototype, 2026</span>
+  </footer>
+</div>
+
+<script>
+(() => {
+  const MIN = 87.5, MAX = 108;
+  const pct = f => ((f - MIN) / (MAX - MIN)) * 100;
+  const $ = id => document.getElementById(id);
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ---------- data (examples) ----------
+  const stations = [
+    { f: 88.3, name: 'Night Bus', c: '#AAB7BF', host: 'Ama Mensah', city: 'Leeds', kind: 'Slow jazz for the last ride home', listeners: 212, sound: { type: 'pad', root: 50, tempo: 64 } },
+    { f: 91.7, name: 'Kitchen Table', c: '#ED8008', host: 'Rafael & Iris', city: 'Lisbon', kind: 'Talk · neighbourhood news', listeners: 87, sound: { type: 'talk', voices: [112, 196] } },
+    { f: 95.3, name: 'Allotment Hour', c: '#736B1E', host: 'Bev Okafor', city: 'Bristol', kind: 'Gardening call-in', listeners: 54, sound: { type: 'talk', voices: [150] } },
+    { f: 98.9, name: 'Tape Loop Club', c: '#BF1B1B', host: 'Jun Park', city: 'Seoul', kind: 'Experimental electronics', listeners: 143, sound: { type: 'arp', root: 57, tempo: 124 } },
+    { f: 102.5, name: 'Choir Practice', c: '#D9D2C6', host: 'St Anne’s Community Choir', city: 'Cork', kind: 'Rehearsal, warts and all', listeners: 31, sound: { type: 'pad', root: 55, tempo: 48, choir: true } },
+    { f: 105.9, name: 'Late Shift', c: '#261201', host: 'Dee Lawson', city: 'Detroit', kind: 'Soul 45s and requests', listeners: 176, sound: { type: 'groove', root: 45, tempo: 94 } },
+  ];
+  const schedule = [
+    { t: '20:00', name: 'Second-hand Records', host: 'Mo Idris · Glasgow', kind: 'The stories behind charity-shop vinyl' },
+    { t: '21:30', name: 'Night Nurses', host: 'Theresa Coyle · Dublin', kind: 'Call-in for people working the late shift' },
+    { t: '23:00', name: 'Words for Rain', host: 'Kiri Walker · Wellington', kind: 'Poetry read aloud, listeners send lines' },
+    { t: '00:30', name: 'The Quiet Hour', host: 'Field Recording Society', kind: 'No talking. Just a microphone out a window.' },
+  ];
+
+  // ---------- logo ----------
+  const RINGS = 6, HOLE = 0.3;
+  function drawLogo(svg, rings) {
+    const s = 40 / (rings + 0.5), r = s * HOLE;
+    let out = '';
+    for (let k = 0; k <= rings; k++) {
+      const n = k === 0 ? 1 : Math.round(2 * Math.PI * k);
+      for (let j = 0; j < n; j++) {
+        const a = (j / n) * Math.PI * 2 + (k % 2 ? Math.PI / n : 0) - Math.PI / 2;
+        const x = (Math.cos(a) * k * s).toFixed(2), y = (Math.sin(a) * k * s).toFixed(2);
+        out += k === 0
+          ? `<circle cx="0" cy="0" r="${(r * 1.15).toFixed(2)}" fill="var(--orange)"/>`
+          : `<circle cx="${x}" cy="${y}" r="${r.toFixed(2)}" fill="var(--ink)"/>`;
+      }
+    }
+    svg.innerHTML = out;
+  }
+  document.querySelectorAll('svg.logo').forEach(svg => drawLogo(svg, RINGS));
+
+  // ---------- dial ----------
+  const ticks = $('ticks'), labels = $('labels');
+  for (let f = 88; f <= 108; f += 0.5) {
+    const t = document.createElement('span');
+    t.style.left = pct(f) + '%';
+    if (f % 2 === 0) t.className = 'major';
+    ticks.appendChild(t);
+  }
+  for (let f = 88; f <= 108; f += 4) {
+    const l = document.createElement('span');
+    l.style.left = pct(f) + '%'; l.textContent = f;
+    labels.appendChild(l);
+  }
+
+  let freq = 98.9, powered = false, volume = 0.7;
+
+  function signalFor(s, f) { return Math.max(0, 1 - Math.abs(f - s.f) / 0.55); }
+  function strongest(f) {
+    let best = null, sig = 0;
+    for (const s of stations) { const v = signalFor(s, f); if (v > sig) { sig = v; best = s; } }
+    return { best, sig };
+  }
+
+  function render() {
+    const { best, sig } = strongest(freq);
+    $('freq').textContent = freq.toFixed(1);
+    $('needle').style.left = pct(freq) + '%';
+    $('tuner').value = freq;
+    const bars = Math.round(sig * 5);
+    [...$('signal').children].forEach((b, i) => b.classList.toggle('on', i < bars));
+    $('onairLamp').classList.toggle('lit', sig > 0.6);
+    if (best && sig > 0.2) {
+      $('showName').textContent = best.name;
+      $('showMeta').textContent = `${best.host} · ${best.city} · ${best.listeners} listening`;
+    } else {
+      $('showName').textContent = 'Between stations';
+      $('showMeta').textContent = 'Only static here. Keep turning.';
+    }
+    document.querySelectorAll('.key').forEach(k => k.setAttribute('aria-pressed', Math.abs(+k.dataset.f - freq) < 0.05 ? 'true' : 'false'));
+    audioTune();
+  }
+
+  function renderStations() {
+    stations.sort((a, b) => a.f - b.f);
+    $('markers').innerHTML = stations.map(s => `<span style="left:${pct(s.f)}%;--c:${s.c}"></span>`).join('');
+    $('keys').innerHTML = stations.map(s =>
+      `<button type="button" class="key" data-f="${s.f}" style="--c:${s.c}" aria-pressed="false" aria-label="${esc(s.name)}, ${s.f} megahertz"><span>${s.f.toFixed(1)}</span><span class="cap"></span><span class="led"></span></button>`).join('');
+    $('liveCount').textContent = stations.length;
+    renderList();
+    render();
+  }
+
+  function renderList() {
+    const rows = [...stations].sort((a, b) => (b.mine ? 1 : 0) - (a.mine ? 1 : 0) || b.listeners - a.listeners);
+    $('onairList').innerHTML = rows.map(s => `
+      <li class="${s.mine ? 'mine' : ''}">
+        <span class="f"><i class="swatch" style="--c:${s.c}"></i>${s.f.toFixed(1)}</span>
+        <div><div class="t">${esc(s.name)}${s.mine ? '<span class="you">You</span>' : ''}</div><div class="h">${esc(s.host)} · ${esc(s.city)}</div></div>
+        <span class="k">${esc(s.kind)}</span>
+        <span class="n">${s.listeners} listening</span>
+        <button type="button" class="btn" data-tune="${s.f}">Tune in</button>
+      </li>`).join('');
+    const total = stations.reduce((n, s) => n + s.listeners, 0);
+    $('totalListeners').textContent = `${total.toLocaleString()} listening`;
+  }
+  function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+
+  $('schedList').innerHTML = schedule.map((s, i) => `
+    <li>
+      <span class="f">${s.t}</span>
+      <div><div class="t">${s.name}</div><div class="h">${s.host}</div></div>
+      <span class="k">${s.kind}</span>
+      <button type="button" class="btn" id="remind${i}" aria-pressed="false">Remind me</button>
+    </li>`).join('');
+  $('schedList').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    const on = b.getAttribute('aria-pressed') !== 'true';
+    b.setAttribute('aria-pressed', on); b.textContent = on ? 'Reminder set' : 'Remind me';
+  });
+
+  // tuning interactions
+  let anim = null;
+  function setFreq(v) { freq = Math.round(Math.min(MAX, Math.max(MIN, v)) * 10) / 10; render(); }
+  function sweepTo(target) {
+    cancelAnimationFrame(anim);
+    const from = freq, t0 = performance.now(), dur = reduceMotion ? 1 : 260 + Math.abs(target - from) * 45;
+    const step = now => {
+      const p = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - p, 3);
+      freq = Math.round((from + (target - from) * e) * 10) / 10; render();
+      if (p < 1) anim = requestAnimationFrame(step);
+    };
+    anim = requestAnimationFrame(step);
+  }
+  $('tuner').addEventListener('input', e => { cancelAnimationFrame(anim); setFreq(+e.target.value); });
+  $('dial').addEventListener('wheel', e => { e.preventDefault(); cancelAnimationFrame(anim); setFreq(freq + (e.deltaY > 0 || e.deltaX > 0 ? 0.1 : -0.1)); }, { passive: false });
+  $('keys').addEventListener('click', e => { const k = e.target.closest('.key'); if (k) { sweepTo(+k.dataset.f); if (!powered) togglePower(); } });
+  $('onairList').addEventListener('click', e => {
+    const b = e.target.closest('[data-tune]'); if (!b) return;
+    $('listen').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' });
+    sweepTo(+b.dataset.tune); if (!powered) togglePower();
+  });
+
+  // ---------- audio ----------
+  let ac, master, analyser, staticGain, staticFilter, delayIn, noiseBuf, freqData;
+  const mulberry = a => () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+  const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
+  const PROG = [[0, 4, 7, 11], [5, 9, 12, 16], [-3, 0, 4, 7], [2, 5, 9, 12]];
+  const PENTA = [0, 2, 4, 7, 9];
+
+  function initAudio() {
+    ac = new (window.AudioContext || window.webkitAudioContext)();
+    master = ac.createGain(); master.gain.value = 0;
+    analyser = ac.createAnalyser(); analyser.fftSize = 256; analyser.smoothingTimeConstant = 0.75;
+    freqData = new Uint8Array(analyser.frequencyBinCount);
+    master.connect(analyser); analyser.connect(ac.destination);
+
+    noiseBuf = ac.createBuffer(1, ac.sampleRate * 2, ac.sampleRate);
+    const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    const src = ac.createBufferSource(); src.buffer = noiseBuf; src.loop = true;
+    staticFilter = ac.createBiquadFilter(); staticFilter.type = 'bandpass'; staticFilter.frequency.value = 2200; staticFilter.Q.value = 0.5;
+    staticGain = ac.createGain(); staticGain.gain.value = 0;
+    src.connect(staticFilter).connect(staticGain).connect(master); src.start();
+
+    const delay = ac.createDelay(1); delay.delayTime.value = 0.36;
+    const fb = ac.createGain(); fb.gain.value = 0.32;
+    const wet = ac.createGain(); wet.gain.value = 0.25;
+    delay.connect(fb).connect(delay); delay.connect(wet).connect(master);
+    delayIn = delay;
+
+    stations.forEach(setupStation);
+    setInterval(scheduler, 40);
+  }
+  function setupStation(s) {
+    if (!ac || s.out) return;
+    s.out = ac.createGain(); s.out.gain.value = 0; s.out.connect(master);
+    if (s.sound.type !== 'talk') s.out.connect(delayIn);
+    if (s.sound.type === 'talk') { const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 3200; s.bus = ac.createGain(); s.bus.connect(lp).connect(s.out); }
+    else s.bus = s.out;
+    s.next = ac.currentTime + 0.05; s.step = 0; s.rnd = mulberry(Math.round(s.f * 10)); s.level = 0; s.voice = 0;
+  }
+  function audioTune() {
+    if (!ac) return;
+    const now = ac.currentTime; let maxSig = 0;
+    for (const s of stations) {
+      const v = Math.pow(signalFor(s, freq), 1.4); maxSig = Math.max(maxSig, v); s.level = v;
+      s.out && s.out.gain.setTargetAtTime(v, now, 0.04);
+    }
+    staticGain.gain.setTargetAtTime(0.012 + 0.16 * Math.pow(1 - maxSig, 1.3), now, 0.04);
+    staticFilter.frequency.setTargetAtTime(1400 + ((freq * 10) % 17) * 110, now, 0.05);
+  }
+  function setMaster() { if (ac) master.gain.setTargetAtTime(powered ? volume * 0.9 : 0, ac.currentTime, 0.06); }
+
+  function tone(s, t, midi, dur, o = {}) {
+    const osc = ac.createOscillator(), g = ac.createGain();
+    osc.type = o.wave || 'sine'; osc.frequency.value = mtof(midi);
+    if (o.detune) osc.detune.value = o.detune;
+    const atk = Math.min(o.attack || 0.01, dur * 0.8), vol = o.vol || 0.1;
+    g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(vol, t + atk);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    let node = osc;
+    if (o.cutoff) { const f = ac.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = o.cutoff; osc.connect(f); node = f; }
+    node.connect(g).connect(s.bus); osc.start(t); osc.stop(t + dur + 0.05);
+  }
+  function hat(s, t, vol) {
+    const src = ac.createBufferSource(); src.buffer = noiseBuf;
+    const hp = ac.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 7000;
+    const g = ac.createGain(); g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.04);
+    src.connect(hp).connect(g).connect(s.bus); src.start(t, Math.random()); src.stop(t + 0.06);
+  }
+  function kick(s, t) {
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.frequency.setValueAtTime(110, t); o.frequency.exponentialRampToValueAtTime(42, t + 0.12);
+    g.gain.setValueAtTime(0.35, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.25);
+    o.connect(g).connect(s.bus); o.start(t); o.stop(t + 0.3);
+  }
+  function syllable(s, t, base) {
+    const r = s.rnd, dur = 0.07 + r() * 0.13;
+    const o = ac.createOscillator(); o.type = 'sawtooth';
+    const p = base * (0.9 + r() * 0.35);
+    o.frequency.setValueAtTime(p, t); o.frequency.linearRampToValueAtTime(p * (0.82 + r() * 0.25), t + dur);
+    const f1 = ac.createBiquadFilter(); f1.type = 'bandpass'; f1.frequency.value = 320 + r() * 520; f1.Q.value = 5;
+    const f2 = ac.createBiquadFilter(); f2.type = 'bandpass'; f2.frequency.value = 950 + r() * 1400; f2.Q.value = 7;
+    const g = ac.createGain();
+    g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.9, t + 0.018); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(f1); o.connect(f2); f1.connect(g); f2.connect(g); g.connect(s.bus);
+    o.start(t); o.stop(t + dur + 0.05);
+    return dur;
+  }
+
+  function play(s, t) {
+    const S = s.sound, r = s.rnd;
+    if (S.type === 'pad') {
+      const beat = 60 / S.tempo, chord = PROG[Math.floor(s.step / 8) % 4];
+      if (s.step % 8 === 0) {
+        chord.forEach(c => tone(s, t, S.root + c, beat * 8.5, { wave: S.choir ? 'sawtooth' : 'triangle', vol: S.choir ? 0.022 : 0.045, attack: beat * 2, cutoff: S.choir ? 1100 : 1600, detune: (r() - 0.5) * 14 }));
+        tone(s, t, S.root + chord[0] - 12, beat * 8, { wave: 'sine', vol: 0.08, attack: 0.3 });
+      }
+      if (!S.choir && r() < 0.5) tone(s, t, S.root + 12 + PENTA[Math.floor(r() * 5)] + (r() < 0.25 ? 12 : 0), beat * 1.6, { vol: 0.07, attack: 0.015 });
+      if (S.choir && s.step % 2 === 0) tone(s, t, S.root + 12 + chord[Math.floor(r() * 3)], beat * 2.2, { wave: 'sawtooth', vol: 0.02, attack: beat * 0.6, cutoff: 1400 });
+      s.next += beat;
+    } else if (S.type === 'arp') {
+      const beat = 60 / S.tempo / 2, chord = PROG[Math.floor(s.step / 16) % 4];
+      const idx = [0, 1, 2, 3, 2, 1, 2, 0][s.step % 8];
+      tone(s, t, S.root + 12 + chord[idx], beat * 0.9, { wave: 'square', vol: 0.03, cutoff: 900 + 700 * Math.sin(s.step / 10) + 700 });
+      if (s.step % 8 === 0) tone(s, t, S.root + chord[0] - 12, beat * 7, { wave: 'triangle', vol: 0.1, attack: 0.02 });
+      s.next += beat;
+    } else if (S.type === 'groove') {
+      const beat = 60 / S.tempo / 2, pos = s.step % 8, chord = PROG[Math.floor(s.step / 16) % 4];
+      if (pos === 0 || pos === 4) kick(s, t);
+      if (pos % 2 === 1) hat(s, t, 0.06);
+      if ([0, 3, 6].includes(pos)) tone(s, t, S.root + chord[0] + (pos === 6 ? 7 : 0), beat * 1.1, { wave: 'triangle', vol: 0.16, cutoff: 700 });
+      if (pos === 2 || pos === 6) chord.slice(1).forEach(c => tone(s, t, S.root + 12 + c, beat * 1.2, { wave: 'sine', vol: 0.035, attack: 0.005 }));
+      s.next += beat;
+    } else if (S.type === 'talk') {
+      if (r() < 0.12) { s.next += 0.35 + r() * 0.6; if (r() < 0.35) s.voice = (s.voice + 1) % S.voices.length; }
+      else s.next += syllable(s, t, S.voices[s.voice]) + 0.02 + r() * 0.06;
+    } else if (S.type === 'bell') {
+      tone(s, t, 74, 1.4, { vol: 0.08 }); tone(s, t, 86, 0.8, { vol: 0.03 });
+      s.next += 1.6;
+    }
+    s.step++;
+  }
+  function scheduler() {
+    if (!powered) return;
+    const now = ac.currentTime, ahead = now + 0.15;
+    for (const s of stations) {
+      if (!s.out) continue;
+      if (s.level < 0.004) { s.next = Math.max(s.next, now); continue; }
+      if (s.next < now) s.next = now;
+      while (s.next < ahead) play(s, s.next);
+    }
+  }
+
+  function togglePower() {
+    powered = !powered;
+    if (powered) { if (!ac) initAudio(); ac.resume(); audioTune(); }
+    setMaster();
+    $('power').setAttribute('aria-pressed', powered);
+    $('power').setAttribute('aria-label', powered ? 'Stop listening' : 'Listen');
+    $('transportTitle').textContent = powered ? 'Listening' : 'Press to listen';
+    $('transportSub').textContent = powered ? 'Drag the dial between stations to hear the static.' : 'Then drag the dial or press a station key.';
+  }
+  $('power').addEventListener('click', togglePower);
+  $('volume').addEventListener('input', e => { volume = +e.target.value; setMaster(); });
+
+  // ---------- speaker grille (the logo, at full size) ----------
+  const cv = $('grille'), g2 = cv.getContext('2d');
+  let holes = [], rings = RINGS, ringE = new Float32Array(rings + 1), size = 0, dpr = 1;
+  function layout() {
+    dpr = Math.min(2, window.devicePixelRatio || 1);
+    size = cv.clientWidth; cv.width = size * dpr; cv.height = size * dpr;
+    const R = size / 2, s = (R * 0.94) / (rings + 0.5);
+    holes = [];
+    for (let k = 0; k <= rings; k++) {
+      const n = k === 0 ? 1 : Math.round(2 * Math.PI * k);
+      for (let j = 0; j < n; j++) {
+        const a = (j / n) * Math.PI * 2 + (k % 2 ? Math.PI / n : 0) - Math.PI / 2;
+        holes.push({ k, x: R + Math.cos(a) * k * s, y: R + Math.sin(a) * k * s });
+      }
+    }
+    layout.hr = s * HOLE;
+    draw();
+  }
+  function css(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+  function draw() {
+    const hole = css('--hole'), orange = css('--orange');
+    const R = size / 2, hr = layout.hr;
+    g2.setTransform(dpr, 0, 0, dpr, 0, 0);
+    g2.clearRect(0, 0, size, size);
+    for (const h of holes) {
+      const e = powered ? ringE[h.k] : 0;
+      if (h.k === 0) {
+        g2.beginPath(); g2.arc(h.x, h.y, hr * (1.15 + e * 0.3), 0, Math.PI * 2); g2.fillStyle = orange; g2.fill();
+        continue;
+      }
+      const rad = hr * (1 + (reduceMotion ? 0 : e * 0.28));
+      g2.beginPath(); g2.arc(h.x, h.y, rad, 0, Math.PI * 2); g2.fillStyle = hole; g2.fill();
+      const glow = Math.min(1, Math.max(0, (e - 0.42) * 1.8));
+      if (glow > 0.02) { g2.globalAlpha = glow; g2.fillStyle = orange; g2.fill(); g2.globalAlpha = 1; }
+    }
+  }
+  function loop() {
+    if (powered && analyser) {
+      analyser.getByteFrequencyData(freqData);
+      for (let k = 0; k <= rings; k++) {
+        const bin = Math.min(freqData.length - 1, 1 + Math.floor(k * k * 1.8 + k * 3));
+        const v = freqData[bin] / 255;
+        ringE[k] = ringE[k] * 0.6 + v * 0.4;
+      }
+      draw();
+    } else if (ringE[1] > 0.001) { ringE.fill(0); draw(); }
+    requestAnimationFrame(loop);
+  }
+  new ResizeObserver(layout).observe(cv);
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', draw);
+  new MutationObserver(draw).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  requestAnimationFrame(loop);
+
+  // listeners drift, like a real evening
+  setInterval(() => {
+    stations.forEach(s => { if (!s.mine) s.listeners = Math.max(3, s.listeners + Math.round((Math.random() - 0.45) * 4)); });
+    renderList(); render();
+  }, 5000);
+
+  // ---------- broadcast desk ----------
+  const meter = $('meter');
+  meter.innerHTML = '<i></i>'.repeat(24);
+  const cells = [...meter.children];
+  function setMeter(v) { const n = Math.round(v * 24); cells.forEach((c, i) => { c.classList.toggle('on', i < n); c.classList.toggle('hot', i >= 19); }); }
+  let micTimer = null;
+  $('micBtn').addEventListener('click', () => {
+    clearInterval(micTimer);
+    let t = 0, lvl = 0;
+    $('meterNote').textContent = 'Listening… (simulated)';
+    micTimer = setInterval(() => {
+      t += 1;
+      const target = Math.random() < 0.18 ? 0.05 : 0.45 + Math.random() * 0.35;
+      lvl = lvl * 0.5 + target * 0.5; setMeter(lvl);
+      if (t > 45) { clearInterval(micTimer); setMeter(0); $('meterNote').textContent = 'Level looks good. Peaks stay out of the orange.'; }
+    }, 70);
+  });
+
+  let mine = null, liveStart = 0, liveTick = null;
+  function freeFrequency() {
+    let best = 100, bestD = -1;
+    for (let f = 88.9; f <= 107.3; f += 0.2) {
+      const d = Math.min(...stations.map(s => Math.abs(s.f - f)));
+      if (d > bestD + 0.01) { bestD = d; best = f; }
+    }
+    return Math.round(best * 10) / 10;
+  }
+  $('console').addEventListener('submit', e => {
+    e.preventDefault();
+    if (!mine) {
+      const name = $('fShow').value.trim();
+      if (!name) { $('liveMsg').innerHTML = '<span class="err">Give your show a name first, then go on air.</span>'; $('fShow').focus(); return; }
+      mine = { f: freeFrequency(), name, host: $('fHost').value.trim() || 'You', city: 'Live now', kind: $('fAbout').value.trim() || 'A new show', listeners: 0, mine: true, c: '#ED3F1C', sound: { type: 'bell' } };
+      stations.push(mine); setupStation(mine); renderStations();
+      liveStart = Date.now();
+      liveTick = setInterval(() => {
+        const s = Math.floor((Date.now() - liveStart) / 1000);
+        $('liveTime').textContent = [s / 3600, (s % 3600) / 60, s % 60].map(v => String(Math.floor(v)).padStart(2, '0')).join(':');
+        if (Math.random() < 0.3) mine.listeners += 1;
+        $('liveListeners').textContent = mine.listeners;
+      }, 1000);
+      $('goLive').textContent = 'End show'; $('goLive').classList.add('live');
+      $('deskLamp').classList.add('lit');
+      $('liveMsg').innerHTML = `You are on <b class="mono">${mine.f.toFixed(1)}</b>. <button type="button" id="findMe">Find it on the dial</button>`;
+      $('findMe').addEventListener('click', () => { $('listen').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' }); sweepTo(mine.f); if (!powered) togglePower(); });
+    } else {
+      clearInterval(liveTick);
+      if (mine.out) mine.out.disconnect();
+      stations.splice(stations.indexOf(mine), 1);
+      const heard = mine.listeners; mine = null; renderStations();
+      $('goLive').textContent = 'Go on air'; $('goLive').classList.remove('live');
+      $('deskLamp').classList.remove('lit');
+      $('liveTime').textContent = '00:00:00'; $('liveListeners').textContent = '0';
+      $('liveMsg').textContent = `Show ended. ${heard} ${heard === 1 ? 'person' : 'people'} tuned in. Your frequency is back in the pool.`;
+    }
+  });
+
+  renderStations();
+})();
+</script>
+</body>
+</html>
