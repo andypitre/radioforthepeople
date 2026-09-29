@@ -9,13 +9,12 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
 <style>
-html { -webkit-text-size-adjust: 100%; }
 body { margin: 0; }
 img { max-width: 100%; }
 [hidden] { display: none !important; }
 
-/* Layout: the site is one Braun-style receiver. A single device panel is the hero; everything below is quiet
-   grey ground with hairline rules, like the back of a product manual. Orange is reserved for "live". */
+/* Layout: the site is one flat Braun-style receiver. The hero is the device; below it, quiet grey ground with
+   hairline rules like a product manual. Orange is reserved for "live". Each show owns one palette colour. */
 :root {
   /* Dieter Rams palettes DR01 + DR06 */
   --ground: #E9E7E1;
@@ -26,10 +25,6 @@ img { max-width: 100%; }
   --line: #BFB1A8;
   --hole: #1C1109;
   --orange: #ED3F1C;
-  --green: #736B1E;
-  --rim: #1C1109;
-  --shadow: rgba(38, 18, 1, .2);
-  --hi: rgba(255, 255, 255, .55);
 
   --display: "Schibsted Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif;
   --body: "Schibsted Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -38,14 +33,12 @@ img { max-width: 100%; }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --ground: #15110D; --panel: #221B15; --key: #2C241D; --ink: #EDE6DA; --ink-2: #A8998C;
-    --line: #3F352D; --hole: #070504; --orange: #F14A26; --green: #8E8530; --rim: #000;
-    --shadow: rgba(0, 0, 0, .55); --hi: rgba(255, 255, 255, .05); color-scheme: dark;
+    --line: #3F352D; --hole: #070504; --orange: #F14A26; color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --ground: #15110D; --panel: #221B15; --key: #2C241D; --ink: #EDE6DA; --ink-2: #A8998C;
-    --line: #3F352D; --hole: #070504; --orange: #F14A26; --green: #8E8530; --rim: #000;
-    --shadow: rgba(0, 0, 0, .55); --hi: rgba(255, 255, 255, .05); color-scheme: dark;
+  --line: #3F352D; --hole: #070504; --orange: #F14A26; color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
@@ -61,176 +54,167 @@ a { color: inherit; }
 button { font: inherit; color: inherit; }
 :focus-visible { outline: 2px solid var(--orange); outline-offset: 3px; }
 .mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
-.label {
-  font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2);
-}
+.label { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }
 
 /* ---------- header ---------- */
-.top {
-  display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
-  padding-block: 22px; border-bottom: 1px solid var(--line);
-}
+.top { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; padding-block: 22px; border-bottom: 1px solid var(--line); }
 .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; margin-right: auto; }
 .brand svg { width: 44px; height: 44px; flex: none; }
 .wordmark { font-family: var(--display); font-weight: 600; font-size: 18px; letter-spacing: -.01em; }
-.top nav { display: flex; gap: 20px; }
+.top nav { display: flex; gap: 20px; flex-wrap: wrap; }
 .top nav a { text-decoration: none; font-size: 15px; color: var(--ink-2); }
 .top nav a:hover { color: var(--ink); }
 .livecount { display: flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 12px; color: var(--ink-2); }
 .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--orange); display: inline-block; }
-@media (max-width: 640px) { .livecount { display: none; } .top nav { gap: 14px; } }
+.dot.off { background: var(--line); }
+@media (max-width: 700px) { .livecount { display: none; } .top nav { gap: 14px; } }
 
 /* ---------- hero ---------- */
-.hero { padding-block: 56px 24px; display: grid; gap: 36px; }
+.hero { padding-block: 56px 0; display: grid; gap: 28px; }
 .intro { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 32px; align-items: end; }
-h1 {
-  font-family: var(--display); font-weight: 600; font-size: clamp(2.3rem, 5.4vw, 4rem);
-  line-height: 1; letter-spacing: -.035em; margin: 0; text-wrap: balance;
-}
+h1 { font-family: var(--display); font-weight: 600; font-size: clamp(2.3rem, 5.4vw, 4rem); line-height: 1; letter-spacing: -.035em; margin: 0; text-wrap: balance; }
 .intro p { margin: 0; color: var(--ink-2); max-width: 40ch; font-size: 17px; }
 @media (max-width: 760px) { .intro { grid-template-columns: 1fr; gap: 16px; } }
 
 /* ---------- the receiver ---------- */
-.device {
-  background: var(--panel); border: 0; border-radius: 22px;
-  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 44px;
-  padding: 36px;
-}
+.device { background: var(--panel); border-radius: 22px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 44px; padding: 36px; }
 @media (max-width: 820px) { .device { grid-template-columns: 1fr; padding: 22px; gap: 28px; } }
 .grille-wrap { position: relative; aspect-ratio: 1; max-width: 100%; width: 100%; max-height: 460px; justify-self: center; align-self: center; }
 @media (max-width: 820px) { .grille-wrap { max-width: 340px; } }
 #grille { width: 100%; height: 100%; display: block; }
 
 .controls { display: flex; flex-direction: column; gap: 22px; min-width: 0; }
-.device-foot {
-  grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: baseline; gap: 16px;
-  font-family: var(--display); font-weight: 600; font-size: clamp(17px, 2.2vw, 22px); letter-spacing: -.01em;
-  margin-top: -8px;
-}
-.badge { font-family: var(--display); font-weight: 600; font-size: 14px; letter-spacing: -.01em; }
+.device-foot { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: baseline; gap: 16px; font-family: var(--display); font-weight: 600; font-size: clamp(17px, 2.2vw, 22px); letter-spacing: -.01em; margin-top: -8px; }
 
-.display {
-  border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
-  padding-block: 18px; display: grid; grid-template-columns: auto 1fr; gap: 6px 20px; align-items: end;
-}
-.readout { font-family: var(--mono); font-size: clamp(44px, 6vw, 64px); line-height: .9; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
-.readout .unit { font-size: 13px; letter-spacing: .06em; margin-left: 6px; color: var(--ink-2); }
+/* band switch: Live / Archive, like the band selector on a world receiver */
+.bandrow { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.band { display: inline-grid; grid-template-columns: 1fr 1fr; background: var(--key); border-radius: 999px; padding: 3px; }
+.band button { border: 0; background: none; padding: 7px 18px; border-radius: 999px; font-weight: 600; font-size: 14px; cursor: pointer; color: var(--ink-2); display: inline-flex; align-items: center; gap: 8px; transition: background .15s, color .15s; }
+.band button::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; opacity: .5; }
+.band button[aria-checked="true"] { background: var(--ink); color: var(--panel); }
+.band button[aria-checked="true"]::before { opacity: 1; }
+.band button[data-band="live"][aria-checked="true"] { background: var(--orange); color: #fff; }
+.band button:disabled { cursor: not-allowed; opacity: .45; }
+.another { margin-left: auto; display: inline-flex; align-items: center; gap: 8px; }
+.another svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+.display { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding-block: 18px; display: grid; grid-template-columns: auto 1fr; gap: 6px 20px; align-items: end; }
+.readout { font-family: var(--mono); font-size: clamp(38px, 5.2vw, 56px); line-height: .9; letter-spacing: -.04em; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.readout .unit { font-size: 13px; letter-spacing: .06em; margin-left: 8px; color: var(--ink-2); }
 .lamps { display: flex; gap: 16px; align-items: center; justify-content: flex-end; padding-bottom: 4px; }
 .lamp { display: flex; align-items: center; gap: 7px; font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); }
 .lamp::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--line); transition: background .2s; }
 .lamp.lit { color: var(--ink); }
 .lamp.lit::before { background: var(--orange); }
+.lamp.rec.lit::before { background: var(--ink); }
 .signal { display: flex; gap: 3px; align-items: flex-end; height: 16px; }
 .signal i { width: 4px; background: var(--line); border-radius: 1px; transition: background .15s; }
 .signal i:nth-child(1) { height: 20%; } .signal i:nth-child(2) { height: 40%; } .signal i:nth-child(3) { height: 60%; }
 .signal i:nth-child(4) { height: 80%; } .signal i:nth-child(5) { height: 100%; }
 .signal i.on { background: var(--ink); }
 .now { grid-column: 1 / -1; min-width: 0; padding-top: 10px; }
-.show { font-family: var(--display); font-weight: 600; font-size: 22px; letter-spacing: -.02em; line-height: 1.2; }
+.show { font-family: var(--display); font-weight: 600; font-size: 22px; letter-spacing: -.02em; line-height: 1.2; text-decoration: none; }
+a.show:hover { text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; }
 .meta { color: var(--ink-2); font-size: 14px; }
+@media (max-width: 460px) { .display { grid-template-columns: 1fr; } .lamps { justify-content: flex-start; } }
 
 /* dial */
-.dial { position: relative; height: 78px; user-select: none; touch-action: pan-y; border-radius: 6px; }
+.dial { position: relative; height: 74px; user-select: none; touch-action: pan-y; border-radius: 6px; }
 .dial:focus-within { outline: 2px solid var(--orange); outline-offset: 6px; }
 .dial .markers, .dial .ticks, .dial .labels { position: absolute; left: 0; right: 0; }
 .markers { top: 0; height: 12px; }
 .markers span { position: absolute; top: 1px; width: 10px; height: 10px; margin-left: -5px; border-radius: 50%; background: var(--c); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 75%, var(--ink)); }
-.ticks { top: 20px; height: 28px; border-bottom: 1px solid var(--ink-2); }
-.ticks span { position: absolute; bottom: 0; width: 1px; height: 9px; background: var(--ink-2); }
-.ticks span.major { height: 20px; background: var(--ink); }
-.labels { top: 54px; height: 16px; }
-.labels span { position: absolute; transform: translateX(-50%); font-family: var(--mono); font-size: 11px; color: var(--ink-2); }
-.needle { position: absolute; top: -4px; height: 58px; width: 2px; margin-left: -1px; background: var(--orange); border-radius: 1px; pointer-events: none; }
+.ticks { top: 20px; height: 28px; border-bottom: 1px solid var(--ink-2); background: repeating-linear-gradient(to right, var(--ink-2) 0 1px, transparent 1px 2.5%) bottom / 100% 9px no-repeat; }
+.labels { top: 54px; height: 16px; font-family: var(--mono); font-size: 11px; color: var(--ink-2); display: flex; justify-content: space-between; }
+.needle { position: absolute; top: -4px; height: 56px; width: 2px; margin-left: -1px; background: var(--orange); border-radius: 1px; pointer-events: none; }
 .needle::after { content: ""; position: absolute; left: -4px; top: -2px; width: 10px; height: 10px; border-radius: 50%; background: var(--orange); }
-#tuner {
-  position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: ew-resize;
-  -webkit-appearance: none; appearance: none; background: transparent;
-}
-#tuner::-webkit-slider-thumb { -webkit-appearance: none; width: 2px; height: 78px; }
-#tuner::-moz-range-thumb { width: 2px; height: 78px; border: 0; }
+#tuner { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: ew-resize; -webkit-appearance: none; appearance: none; background: transparent; }
+#tuner::-webkit-slider-thumb { -webkit-appearance: none; width: 2px; height: 74px; }
+#tuner::-moz-range-thumb { width: 2px; height: 74px; border: 0; }
 
-/* preset keys: round coloured buttons, label printed above, as on the DR panels */
-.keys { display: grid; grid-template-columns: repeat(auto-fit, minmax(54px, 1fr)); gap: 14px 6px; justify-items: center; }
-.key {
-  display: grid; justify-items: center; gap: 10px; background: none; border: 0; padding: 0; cursor: pointer;
-  font-family: var(--display); font-weight: 600; font-size: 11px; letter-spacing: .02em; color: var(--ink-2);
-}
-.key .cap {
-  width: 42px; height: 42px; border-radius: 50%;
-  background: var(--c); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 75%, var(--ink));
-  outline: 2px solid transparent; outline-offset: 3px; transition: outline-color .12s;
-}
+/* show keys: round coloured buttons, label printed above, as on the DR panels */
+.keys { display: grid; grid-template-columns: repeat(auto-fill, minmax(48px, 1fr)); gap: 14px 4px; justify-items: center; }
+.key { display: grid; justify-items: center; gap: 9px; background: none; border: 0; padding: 0; cursor: pointer; font-family: var(--display); font-weight: 600; font-size: 11px; letter-spacing: .02em; color: var(--ink-2); white-space: nowrap; }
+.key .cap { width: 38px; height: 38px; border-radius: 50%; background: var(--c); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 75%, var(--ink)); outline: 2px solid transparent; outline-offset: 3px; transition: outline-color .12s; }
 .key:hover .cap { outline-color: var(--line); }
 .key[aria-pressed="true"] { color: var(--ink); }
 .key[aria-pressed="true"] .cap { outline-color: var(--ink); }
-.key .led { width: 5px; height: 5px; border-radius: 50%; background: transparent; margin-top: -4px; }
+.key .led { width: 5px; height: 5px; border-radius: 50%; background: transparent; margin-top: -3px; }
 .key[aria-pressed="true"] .led { background: var(--orange); }
 
 .transport { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
-.power {
-  width: 64px; height: 64px; border-radius: 50%; border: 1px solid var(--line); background: var(--key);
-  display: grid; place-items: center; cursor: pointer; flex: none;
-  transition: background .15s, border-color .15s;
-}
+.power { width: 64px; height: 64px; border-radius: 50%; border: 1px solid var(--line); background: var(--key); display: grid; place-items: center; cursor: pointer; flex: none; transition: background .15s, border-color .15s; }
 .power svg { width: 22px; height: 22px; fill: var(--ink); }
 .power[aria-pressed="true"] { background: var(--orange); border-color: var(--orange); }
 .power[aria-pressed="true"] svg { fill: #fff; }
 .power .i-stop { display: none; }
 .power[aria-pressed="true"] .i-play { display: none; }
 .power[aria-pressed="true"] .i-stop { display: block; }
-.transport-text { display: grid; gap: 2px; margin-right: auto; }
+.transport-text { display: grid; gap: 2px; margin-right: auto; min-width: 0; flex: 1 1 200px; }
 .transport-text strong { font-weight: 600; font-size: 15px; }
 .transport-text span { font-size: 13px; color: var(--ink-2); }
 .vol { display: flex; align-items: center; gap: 10px; }
-input[type="range"].slim { -webkit-appearance: none; appearance: none; width: 120px; height: 20px; background: transparent; cursor: pointer; }
+input[type="range"].slim { -webkit-appearance: none; appearance: none; width: 110px; height: 20px; background: transparent; cursor: pointer; }
 input[type="range"].slim::-webkit-slider-runnable-track { height: 2px; background: var(--ink-2); }
 input[type="range"].slim::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; margin-top: -6px; border-radius: 50%; background: var(--key); border: 1px solid var(--ink-2); }
 input[type="range"].slim::-moz-range-track { height: 2px; background: var(--ink-2); }
 input[type="range"].slim::-moz-range-thumb { width: 12px; height: 12px; border-radius: 50%; background: var(--key); border: 1px solid var(--ink-2); }
 
-.note { margin: 0; font-size: 13px; color: var(--ink-2); }
+.note { margin: 0; font-size: 13px; color: var(--ink-2); display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.linkbtn { background: none; border: 0; padding: 0; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; color: var(--ink); font-size: inherit; }
+
+/* search */
+.find { padding-top: 40px; }
+.search { display: flex; align-items: center; gap: 12px; background: var(--key); border: 1px solid var(--line); border-radius: 999px; padding: 4px 6px 4px 18px; }
+.search:focus-within { border-color: var(--ink-2); }
+.search svg { width: 18px; height: 18px; fill: none; stroke: var(--ink-2); stroke-width: 1.8; stroke-linecap: round; flex: none; }
+.search input { flex: 1; min-width: 0; border: 0; background: none; font: inherit; font-size: 17px; color: var(--ink); padding-block: 10px; outline: none; }
+.search input::placeholder { color: var(--ink-2); }
+.search .btn { border-radius: 999px; }
 
 /* ---------- sections ---------- */
-section.block { padding-block: 64px 8px; }
+section.block { padding-block: 56px 8px; }
 .block-head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; flex-wrap: wrap; border-bottom: 1px solid var(--ink); padding-bottom: 12px; }
 h2 { font-family: var(--display); font-weight: 600; font-size: clamp(1.6rem, 3vw, 2.1rem); letter-spacing: -.025em; line-height: 1.1; margin: 0; text-wrap: balance; }
 
 .rows { list-style: none; margin: 0; padding: 0; }
-.rows li {
-  display: grid; grid-template-columns: 104px minmax(0, 1.4fr) minmax(0, 1fr) 110px 84px; gap: 16px; align-items: center;
-  padding-block: 16px; border-bottom: 1px solid var(--line);
-}
-.rows .f { display: flex; align-items: center; gap: 10px; font-family: var(--mono); font-size: 20px; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
-.rows .t { font-weight: 600; font-size: 17px; letter-spacing: -.01em; }
-.rows .h { font-size: 14px; color: var(--ink-2); }
-.rows .k { font-size: 14px; color: var(--ink-2); }
+.rows li { display: grid; grid-template-columns: 170px minmax(0, 1.4fr) minmax(0, 1fr) 120px 96px; gap: 16px; align-items: center; padding-block: 16px; border-bottom: 1px solid var(--line); }
+.rows li.empty { display: block; color: var(--ink-2); font-size: 15px; }
+.rows .f { display: flex; align-items: center; gap: 10px; white-space: nowrap; font-family: var(--mono); font-size: 15px; font-variant-numeric: tabular-nums; }
+.rows .t { font-weight: 600; font-size: 17px; letter-spacing: -.01em; text-decoration: none; }
+.rows a.t:hover { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+.rows .h, .rows .k { font-size: 14px; color: var(--ink-2); }
 .rows .n { font-family: var(--mono); font-size: 13px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
-.rows li.mine .f { color: var(--orange); }
+.rows .btn { justify-self: end; }
 .swatch { width: 12px; height: 12px; border-radius: 50%; background: var(--c); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 75%, var(--ink)); flex: none; }
 .you { font-family: var(--mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--orange); margin-left: 8px; }
-.btn {
-  background: var(--key); border: 1px solid var(--line); border-radius: 5px; padding: 8px 14px; font-size: 14px; cursor: pointer;
-  transition: background .12s, color .12s;
-}
+.btn { background: var(--key); border: 1px solid var(--line); border-radius: 5px; padding: 8px 14px; font-size: 14px; cursor: pointer; transition: background .12s, color .12s; white-space: nowrap; }
 .btn:hover { border-color: var(--ink-2); }
 .btn:active, .btn[aria-pressed="true"] { background: var(--ink); color: var(--panel); border-color: var(--ink); }
-.btn[aria-pressed="true"] { border-color: var(--ink-2); }
 @media (max-width: 760px) {
-  .rows li { grid-template-columns: 76px minmax(0, 1fr) auto; gap: 4px 14px; }
-  .rows .f { font-size: 16px; gap: 6px; grid-row: span 2; align-self: start; padding-top: 2px; }
+  .rows li { grid-template-columns: minmax(0, 1fr) auto; gap: 4px 14px; }
+  .rows .f { grid-column: 1; font-size: 13px; }
+  .rows li > div { grid-column: 1; }
   .rows .k { display: none; }
-  .rows .n { grid-column: 2; }
-  .rows .btn { grid-column: 3; grid-row: 1 / span 2; }
+  .rows .n { grid-column: 1; }
+  .rows .btn { grid-column: 2; grid-row: 1 / span 3; }
 }
 
-/* tonight */
-.sched li { grid-template-columns: 104px minmax(0, 1.4fr) minmax(0, 1.2fr) 120px; }
-.sched .f { font-size: 18px; }
-@media (max-width: 760px) {
-  .sched li { grid-template-columns: 64px minmax(0, 1fr) auto; }
-  .sched .k { display: block; grid-column: 2; }
-  .sched .btn { grid-row: 1 / span 3; }
-}
+/* ---------- show page ---------- */
+.showpage { padding-block: 40px 0; }
+.back { font-size: 14px; color: var(--ink-2); text-decoration: none; }
+.back:hover { color: var(--ink); }
+.show-hero { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 48px; align-items: center; padding-top: 24px; }
+@media (max-width: 760px) { .show-hero { grid-template-columns: 1fr; gap: 24px; } }
+.show-mark { background: var(--panel); border-radius: 22px; padding: 40px; display: grid; place-items: center; }
+.show-mark svg { width: 100%; max-width: 300px; height: auto; }
+.show-info { display: grid; gap: 14px; align-content: center; min-width: 0; }
+.show-info p { margin: 0; color: var(--ink-2); font-size: 17px; max-width: 44ch; }
+.show-url { font-family: var(--mono); font-size: 14px; color: var(--ink); overflow-wrap: anywhere; }
+.facts { display: grid; grid-template-columns: auto 1fr; gap: 6px 18px; margin: 4px 0 0; font-size: 15px; }
+.facts dt { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); padding-top: 3px; }
+.facts dd { margin: 0; }
+.actions { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; padding-top: 6px; }
 
 /* host console */
 .host { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 48px; padding-top: 28px; }
@@ -240,38 +224,34 @@ h2 { font-family: var(--display); font-weight: 600; font-size: clamp(1.6rem, 3vw
 .steps .num { font-family: var(--mono); font-size: 13px; color: var(--ink-2); padding-top: 3px; }
 .steps strong { display: block; font-size: 17px; font-weight: 600; letter-spacing: -.01em; }
 .steps p { margin: 2px 0 0; color: var(--ink-2); font-size: 15px; max-width: 38ch; }
-
-.console {
-  background: var(--panel); border: 0; border-radius: 18px; padding: 26px;
-  display: grid; gap: 20px;
-}
+.console { background: var(--panel); border-radius: 18px; padding: 26px; display: grid; gap: 20px; }
 .console-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.badge { font-family: var(--display); font-weight: 600; font-size: 14px; letter-spacing: -.01em; }
 .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .fields .wide { grid-column: 1 / -1; }
 @media (max-width: 520px) { .fields { grid-template-columns: 1fr; } }
 .field { display: grid; gap: 6px; min-width: 0; }
-.field input, .field select {
-  font: inherit; font-size: 15px; color: var(--ink); background: var(--key); border: 1px solid var(--line);
-  border-radius: 6px; padding: 10px 12px; width: 100%;
-}
+.field input, .field select { font: inherit; font-size: 15px; color: var(--ink); background: var(--key); border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; width: 100%; }
+.url-preview { font-family: var(--mono); font-size: 13px; color: var(--ink-2); overflow-wrap: anywhere; }
+.url-preview b { color: var(--ink); font-weight: 500; }
+.check { display: flex; gap: 10px; align-items: center; font-size: 15px; }
+.check input { width: 18px; height: 18px; accent-color: var(--ink); }
 .meter-row { display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: center; }
 .meter { display: grid; grid-template-columns: repeat(24, 1fr); gap: 3px; height: 14px; }
 .meter i { background: var(--line); border-radius: 1px; }
 .meter i.on { background: var(--ink); }
 .meter i.on.hot { background: var(--orange); }
 .meter-note { grid-column: 1 / -1; font-size: 13px; color: var(--ink-2); margin: 0; }
-.golive-row { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: 20px; }
-.golive {
-  background: var(--ink); color: var(--panel); border: 0; border-radius: 999px; padding: 14px 26px; font-weight: 600; font-size: 16px; cursor: pointer;
-  display: inline-flex; align-items: center; gap: 10px;
-}
-.golive::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--orange); }
-.golive.live { background: var(--orange); color: #fff; }
-.golive.live::before { background: #fff; }
-.live-stats { display: flex; gap: 22px; font-family: var(--mono); font-size: 13px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.golive-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: 20px; }
+.pill { background: var(--ink); color: var(--panel); border: 0; border-radius: 999px; padding: 13px 24px; font-weight: 600; font-size: 16px; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
+.pill.onair::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--orange); }
+.pill.live { background: var(--orange); color: #fff; }
+.pill.live::before { background: #fff; }
+.pill.ghost { background: var(--key); color: var(--ink); border: 1px solid var(--line); }
+.live-stats { display: flex; gap: 22px; font-family: var(--mono); font-size: 13px; color: var(--ink-2); font-variant-numeric: tabular-nums; margin-left: auto; }
 .live-stats b { color: var(--ink); font-weight: 500; }
 .live-msg { margin: 0; font-size: 14px; color: var(--ink-2); flex-basis: 100%; }
-.live-msg button { background: none; border: 0; padding: 0; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; color: var(--ink); font-size: 14px; }
+.live-msg a, .live-msg button { color: var(--ink); }
 .err { color: var(--orange); }
 
 /* principles */
@@ -284,8 +264,6 @@ footer { margin-top: 72px; padding-top: 18px; border-top: 1px solid var(--line);
 footer .brand { margin: 0; }
 footer .brand svg { width: 32px; height: 32px; }
 footer .wordmark { font-size: 14px; color: var(--ink); }
-
-.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
@@ -299,124 +277,147 @@ footer .wordmark { font-size: 14px; color: var(--ink); }
     </a>
     <nav aria-label="Main">
       <a href="#listen">Listen</a>
-      <a href="#tonight">Tonight</a>
-      <a href="#host">Go on air</a>
+      <a href="#find">Search</a>
+      <a href="#coming-up">Coming up</a>
+      <a href="#archive">Archive</a>
+      <a href="#host">Host a show</a>
     </nav>
-    <span class="livecount"><i class="dot"></i><span id="liveCount">6</span>&nbsp;shows on air</span>
+    <span class="livecount"><i class="dot" id="liveDot"></i><span id="liveCount">4 live now</span></span>
   </header>
 
-  <section id="listen" class="hero">
-    <div class="intro">
-      <h1>Radio made by the people next door.</h1>
-      <p>Live shows hosted by anyone with a microphone. Turn the dial to hear who is on air right now, or start your own show tonight.</p>
-    </div>
-
-    <div class="device">
-      <div class="grille-wrap"><canvas id="grille" role="img" aria-label="Speaker grille. It moves with the sound when the radio is on."></canvas></div>
-
-      <div class="controls">
-        <div class="display" aria-live="polite">
-          <div class="readout"><span id="freq">98.9</span><span class="unit">MHz</span></div>
-          <div class="lamps">
-            <span class="signal" id="signal" aria-label="Signal strength"><i></i><i></i><i></i><i></i><i></i></span>
-            <span class="lamp" id="onairLamp">On air</span>
-          </div>
-          <div class="now">
-            <div class="show" id="showName">Tape Loop Club</div>
-            <div class="meta" id="showMeta">Jun Park · Seoul</div>
-          </div>
-        </div>
-
-        <div class="dial" id="dial">
-          <div class="markers" id="markers"></div>
-          <div class="ticks" id="ticks"></div>
-          <div class="labels" id="labels"></div>
-          <div class="needle" id="needle"></div>
-          <input type="range" id="tuner" min="87.5" max="108" step="0.1" value="98.9" aria-label="Tuning dial, megahertz">
-        </div>
-
-        <div class="keys" id="keys" role="group" aria-label="Stations on air"></div>
-
-        <div class="transport">
-          <button class="power" id="power" aria-pressed="false" aria-label="Listen">
-            <svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>
-            <svg class="i-stop" viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="1"/></svg>
-          </button>
-          <div class="transport-text">
-            <strong id="transportTitle">Press to listen</strong>
-            <span id="transportSub">Then drag the dial or press a station key.</span>
-          </div>
-          <label class="vol label" for="volume">Vol <input class="slim" type="range" id="volume" min="0" max="1" step="0.01" value="0.7"></label>
-        </div>
+  <!-- ================= HOME ================= -->
+  <main id="home">
+    <section id="listen" class="hero">
+      <div class="intro">
+        <h1>Radio made by the people next door.</h1>
+        <p>Press play and you hear whoever is on air right now. If nobody is live, the radio plays a show from the archive. Switch bands or press Another show to hear something else.</p>
       </div>
-      <div class="device-foot"><span>radio for the people</span><span>RP01</span></div>
-    </div>
-    <p class="note">Example stations for this prototype. The sound is generated in your browser so you can feel the tuning.</p>
-  </section>
 
-  <section class="block" aria-labelledby="onair-h">
-    <div class="block-head">
-      <h2 id="onair-h">On air now</h2>
-      <span class="label" id="totalListeners">— listening</span>
-    </div>
-    <ul class="rows" id="onairList"></ul>
-  </section>
+      <div class="device">
+        <div class="grille-wrap"><canvas id="grille" role="img" aria-label="Speaker grille. It moves with the sound when the radio is on."></canvas></div>
 
-  <section class="block" id="tonight" aria-labelledby="tonight-h">
-    <div class="block-head">
-      <h2 id="tonight-h">Later tonight</h2>
-      <span class="label">Times in your local zone</span>
-    </div>
-    <ul class="rows sched" id="schedList"></ul>
-  </section>
+        <div class="controls">
+          <div class="bandrow">
+            <div class="band" role="radiogroup" aria-label="Band">
+              <button type="button" role="radio" data-band="live" aria-checked="true">Live</button>
+              <button type="button" role="radio" data-band="archive" aria-checked="false">Archive</button>
+            </div>
+            <button type="button" class="btn another" id="another">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h4c4 0 6 10 10 10h4M3 17h4c1.6 0 2.9-1.6 4-3.5M13 10.5C14.1 8.6 15.4 7 17 7h4M18 4l3 3-3 3M18 14l3 3-3 3"/></svg>
+              Another show
+            </button>
+          </div>
 
-  <section class="block" id="host" aria-labelledby="host-h">
-    <div class="block-head">
-      <h2 id="host-h">Host your own show</h2>
-      <span class="label">Free · no approval queue</span>
-    </div>
-    <div class="host">
-      <ol class="steps">
-        <li><span class="num">1</span><div><strong>Name your show</strong><p>A title and a line about what people will hear. You can change both later.</p></div></li>
-        <li><span class="num">2</span><div><strong>Check your mic</strong><p>Any laptop or phone mic works. Talk for a few seconds and watch the level.</p></div></li>
-        <li><span class="num">3</span><div><strong>Go on air</strong><p>Your show gets its own spot on the dial for as long as you are live. When you stop, the frequency goes back to the pool.</p></div></li>
-      </ol>
+          <div class="display" aria-live="polite">
+            <div class="readout"><span id="readTime">00:42:17</span><span class="unit" id="readUnit">LIVE</span></div>
+            <div class="lamps">
+              <span class="signal" id="signal" aria-label="Signal strength"><i></i><i></i><i></i><i></i><i></i></span>
+              <span class="lamp" id="onairLamp">On air</span>
+            </div>
+            <div class="now">
+              <a class="show" id="showName" href="#night-bus">Night Bus</a>
+              <div class="meta" id="showMeta">Ama Mensah · Leeds</div>
+            </div>
+          </div>
 
-      <form class="console" id="console" novalidate>
-        <div class="console-top">
-          <span class="badge">Broadcast desk</span>
-          <span class="lamp" id="deskLamp">On air</span>
+          <div class="dial" id="dial">
+            <div class="markers" id="markers"></div>
+            <div class="ticks"></div>
+            <div class="labels"><span id="dialLeft">4 live shows</span><span>Drag to tune</span></div>
+            <div class="needle" id="needle"></div>
+            <input type="range" id="tuner" min="0" max="100" step="0.1" value="12.5" aria-label="Tuning dial">
+          </div>
+
+          <div class="keys" id="keys" role="group" aria-label="Shows on this band"></div>
+
+          <div class="transport">
+            <button class="power" id="power" aria-pressed="false" aria-label="Listen">
+              <svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>
+              <svg class="i-stop" viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="1"/></svg>
+            </button>
+            <div class="transport-text">
+              <strong id="transportTitle">Press to listen</strong>
+              <span id="transportSub">Starts with the most popular live show.</span>
+            </div>
+            <label class="vol label" for="volume">Vol <input class="slim" type="range" id="volume" min="0" max="1" step="0.01" value="0.7"></label>
+          </div>
         </div>
-        <div class="fields">
-          <label class="field"><span class="label">Show name</span><input id="fShow" value="Porch Light" autocomplete="off"></label>
-          <label class="field"><span class="label">Host</span><input id="fHost" value="You" autocomplete="off"></label>
-          <label class="field wide"><span class="label">What people will hear</span><input id="fAbout" value="Records from the shoebox, and whoever calls in" autocomplete="off"></label>
-        </div>
-        <div class="meter-row">
-          <button type="button" class="btn" id="micBtn">Check mic</button>
-          <div class="meter" id="meter" aria-hidden="true"></div>
-          <p class="meter-note" id="meterNote">In the app this shows your real input level. Here it is simulated.</p>
-        </div>
-        <div class="golive-row">
-          <button type="submit" class="golive" id="goLive">Go on air</button>
-          <div class="live-stats"><span>Time <b id="liveTime">00:00:00</b></span><span>Listening <b id="liveListeners">0</b></span></div>
-          <p class="live-msg" id="liveMsg">Your show will appear on the dial above as soon as you are live.</p>
-        </div>
+        <div class="device-foot"><span>radio for the people</span><span>RP01</span></div>
+      </div>
+      <p class="note"><span>Example shows for this prototype. Sound is generated in your browser.</span><button type="button" class="linkbtn" id="simulate">Preview the homepage when nobody is live</button></p>
+    </section>
+
+    <section id="find" class="find" aria-label="Search">
+      <form class="search" id="searchForm" role="search">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
+        <input id="q" type="search" placeholder="Find a show, host or city" autocomplete="off" aria-label="Find a show, host or city">
+        <button type="button" class="btn" id="clearQ" hidden>Clear</button>
       </form>
-    </div>
-  </section>
+    </section>
 
-  <section class="block" aria-labelledby="why-h">
-    <div class="block-head">
-      <h2 id="why-h">Less, but better radio</h2>
-      <span class="label">How it works</span>
-    </div>
-    <div class="principles">
-      <div><h3>A dial, not a feed</h3><p>No algorithm picks what you hear. Every live show sits on one dial, and you turn it.</p></div>
-      <div><h3>Anyone can go on air</h3><p>A name, a microphone and an evening. Shows are live and hosted by people, never generated.</p></div>
-      <div><h3>Live, then gone</h3><p>A show happens once, for whoever tuned in. Hosts can choose to keep a recording for their own listeners.</p></div>
-    </div>
-  </section>
+    <section class="block" id="on-air" aria-labelledby="onair-h">
+      <div class="block-head"><h2 id="onair-h">On air now</h2><span class="label" id="totalListeners"></span></div>
+      <ul class="rows" id="onairList"></ul>
+    </section>
+
+    <section class="block" id="coming-up" aria-labelledby="coming-h">
+      <div class="block-head"><h2 id="coming-h">Coming up</h2><span class="label">Times in your local zone</span></div>
+      <ul class="rows" id="comingList"></ul>
+    </section>
+
+    <section class="block" id="archive" aria-labelledby="archive-h">
+      <div class="block-head"><h2 id="archive-h">From the archive</h2><span class="label">Recorded live, kept by the host</span></div>
+      <ul class="rows" id="archiveList"></ul>
+    </section>
+
+    <section class="block" id="host" aria-labelledby="host-h">
+      <div class="block-head"><h2 id="host-h">Host your own show</h2><span class="label">Free · no approval queue</span></div>
+      <div class="host">
+        <ol class="steps">
+          <li><span class="num">1</span><div><strong>Name your show</strong><p>It gets its own page and address that you can share, and it shows up in search.</p></div></li>
+          <li><span class="num">2</span><div><strong>Pick a day and time</strong><p>Listeners see it in Coming up and can set a reminder. Weekly shows keep their slot.</p></div></li>
+          <li><span class="num">3</span><div><strong>Go on air</strong><p>At your time, go live from this desk. Keep the recording and it joins the archive, so the radio can play it when nobody is live.</p></div></li>
+        </ol>
+
+        <form class="console" id="console" novalidate>
+          <div class="console-top"><span class="badge">Broadcast desk</span><span class="lamp" id="deskLamp">On air</span></div>
+          <div class="fields">
+            <label class="field"><span class="label">Show name</span><input id="fShow" value="Porch Light" autocomplete="off"></label>
+            <label class="field"><span class="label">Host</span><input id="fHost" value="You" autocomplete="off"></label>
+            <label class="field wide"><span class="label">What people will hear</span><input id="fAbout" value="Records from the shoebox, and whoever calls in" autocomplete="off"></label>
+            <label class="field"><span class="label">Day</span><select id="fDay"></select></label>
+            <label class="field"><span class="label">Time</span><input id="fTime" type="time" value="21:00"></label>
+            <label class="field"><span class="label">Repeats</span><select id="fRepeat"><option value="weekly">Every week</option><option value="once">Just this once</option></select></label>
+            <label class="check" style="align-self:end;padding-bottom:10px"><input type="checkbox" id="fRecord" checked> Keep recordings in the archive</label>
+          </div>
+          <div class="url-preview">Show page: <b id="urlPreview">radioforthepeople.org/porch-light</b></div>
+          <div class="meter-row">
+            <button type="button" class="btn" id="micBtn">Check mic</button>
+            <div class="meter" id="meter" aria-hidden="true"></div>
+            <p class="meter-note" id="meterNote">In the app this shows your real input level. Here it is simulated.</p>
+          </div>
+          <div class="golive-row">
+            <button type="submit" class="pill" id="scheduleBtn">Schedule show</button>
+            <button type="button" class="pill ghost onair" id="goLive">Go live now</button>
+            <div class="live-stats"><span>Time <b id="liveTime">00:00:00</b></span><span>Listening <b id="liveListeners">0</b></span></div>
+            <p class="live-msg" id="liveMsg">Scheduling puts your show in Coming up. Going live puts it on the dial straight away.</p>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section class="block" aria-labelledby="why-h">
+      <div class="block-head"><h2 id="why-h">Less, but better radio</h2><span class="label">How it works</span></div>
+      <div class="principles">
+        <div><h3>A dial, not a feed</h3><p>No algorithm picks what you hear. Live shows and recordings sit on one dial, and you turn it.</p></div>
+        <div><h3>Anyone can go on air</h3><p>A name, a microphone and a time slot. Shows are hosted by people, never generated.</p></div>
+        <div><h3>Live first, then the archive</h3><p>Shows go out live. Recordings go to the archive, so the radio always has something on.</p></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ================= SHOW PAGE ================= -->
+  <main id="showView" class="showpage" hidden></main>
 
   <footer>
     <a class="brand" href="#listen" aria-label="Back to the top">
@@ -429,150 +430,318 @@ footer .wordmark { font-size: 14px; color: var(--ink); }
 
 <script>
 (() => {
-  const MIN = 87.5, MAX = 108;
-  const pct = f => ((f - MIN) / (MAX - MIN)) * 100;
   const $ = id => document.getElementById(id);
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const MIN = 60000;
+  const now0 = Date.now();
 
-  // ---------- data (examples) ----------
-  const stations = [
-    { f: 88.3, name: 'Night Bus', c: '#AAB7BF', host: 'Ama Mensah', city: 'Leeds', kind: 'Slow jazz for the last ride home', listeners: 212, sound: { type: 'pad', root: 50, tempo: 64 } },
-    { f: 91.7, name: 'Kitchen Table', c: '#ED8008', host: 'Rafael & Iris', city: 'Lisbon', kind: 'Talk · neighbourhood news', listeners: 87, sound: { type: 'talk', voices: [112, 196] } },
-    { f: 95.3, name: 'Allotment Hour', c: '#736B1E', host: 'Bev Okafor', city: 'Bristol', kind: 'Gardening call-in', listeners: 54, sound: { type: 'talk', voices: [150] } },
-    { f: 98.9, name: 'Tape Loop Club', c: '#BF1B1B', host: 'Jun Park', city: 'Seoul', kind: 'Experimental electronics', listeners: 143, sound: { type: 'arp', root: 57, tempo: 124 } },
-    { f: 102.5, name: 'Choir Practice', c: '#D9D2C6', host: 'St Anne’s Community Choir', city: 'Cork', kind: 'Rehearsal, warts and all', listeners: 31, sound: { type: 'pad', root: 55, tempo: 48, choir: true } },
-    { f: 105.9, name: 'Late Shift', c: '#261201', host: 'Dee Lawson', city: 'Detroit', kind: 'Soul 45s and requests', listeners: 176, sound: { type: 'groove', root: 45, tempo: 94 } },
+  // ---------- example shows ----------
+  // live.minAgo: how long the show has been on air; next.sort: minutes from the start of today, for ordering.
+  const shows = [
+    { slug: 'night-bus', name: 'Night Bus', host: 'Ama Mensah', city: 'Leeds', kind: 'Slow jazz for the last ride home', c: '#AAB7BF',
+      sound: { type: 'pad', root: 50, tempo: 64 }, schedule: 'Tuesdays at 19:00', live: { minAgo: 42, listeners: 212 },
+      episodes: [{ d: 22, len: 60, plays: 812 }, { d: 15, len: 60, plays: 944 }] },
+    { slug: 'kitchen-table', name: 'Kitchen Table', host: 'Rafael & Iris', city: 'Lisbon', kind: 'Talk · neighbourhood news', c: '#ED8008',
+      sound: { type: 'talk', voices: [112, 196] }, schedule: 'Tuesdays and Fridays at 18:30', live: { minAgo: 77, listeners: 87 },
+      next: { label: 'Fri 2 Oct 18:30', sort: 3 * 1440 + 1110 }, episodes: [{ d: 25, len: 48, plays: 310 }] },
+    { slug: 'tape-loop-club', name: 'Tape Loop Club', host: 'Jun Park', city: 'Seoul', kind: 'Experimental electronics', c: '#BF1B1B',
+      sound: { type: 'arp', root: 57, tempo: 124 }, schedule: 'Tuesdays at 19:20', live: { minAgo: 27, listeners: 143 },
+      episodes: [{ d: 22, len: 45, plays: 520 }] },
+    { slug: 'late-shift', name: 'Late Shift', host: 'Dee Lawson', city: 'Detroit', kind: 'Soul 45s and requests', c: '#261201',
+      sound: { type: 'groove', root: 45, tempo: 94 }, schedule: 'Tuesdays and Thursdays at 18:50', live: { minAgo: 57, listeners: 176 },
+      next: { label: 'Thu 1 Oct 18:50', sort: 2 * 1440 + 1130 }, episodes: [{ d: 24, len: 90, plays: 1310 }] },
+    { slug: 'second-hand-records', name: 'Second-hand Records', host: 'Mo Idris', city: 'Glasgow', kind: 'The stories behind charity-shop vinyl', c: '#736356',
+      sound: { type: 'groove', root: 43, tempo: 84 }, schedule: 'Tuesdays at 20:00',
+      next: { label: 'Tonight 20:00', sort: 1200 }, episodes: [{ d: 22, len: 61, plays: 733 }] },
+    { slug: 'words-for-rain', name: 'Words for Rain', host: 'Kiri Walker', city: 'Wellington', kind: 'Poetry read aloud, listeners send lines', c: '#BFB1A8',
+      sound: { type: 'talk', voices: [175] }, schedule: 'Tuesdays at 23:00',
+      next: { label: 'Tonight 23:00', sort: 1380 }, episodes: [{ d: 15, len: 35, plays: 288 }] },
+    { slug: 'the-quiet-hour', name: 'The Quiet Hour', host: 'Field Recording Society', city: 'Oslo', kind: 'No talking. A microphone out a window.', c: '#AD1D1D',
+      sound: { type: 'pad', root: 48, tempo: 40, still: true }, schedule: 'Every night at 00:30',
+      next: { label: 'Wed 00:30', sort: 1440 + 30 }, episodes: [{ d: 28, len: 60, plays: 2011 }, { d: 27, len: 60, plays: 1650 }] },
+    { slug: 'choir-practice', name: 'Choir Practice', host: 'St Anne’s Community Choir', city: 'Cork', kind: 'Rehearsal, warts and all', c: '#D9D2C6',
+      sound: { type: 'pad', root: 55, tempo: 48, choir: true }, schedule: 'Wednesdays at 19:30',
+      next: { label: 'Wed 30 Sep 19:30', sort: 1440 + 1170 }, episodes: [{ d: 23, len: 42, plays: 402 }] },
+    { slug: 'allotment-hour', name: 'Allotment Hour', host: 'Bev Okafor', city: 'Bristol', kind: 'Gardening call-in', c: '#736B1E',
+      sound: { type: 'talk', voices: [150] }, schedule: 'Sundays at 10:00',
+      next: { label: 'Sun 4 Oct 10:00', sort: 5 * 1440 + 600 }, episodes: [{ d: 27, len: 58, plays: 1204 }, { d: 20, len: 55, plays: 990 }] },
   ];
-  const schedule = [
-    { t: '20:00', name: 'Second-hand Records', host: 'Mo Idris · Glasgow', kind: 'The stories behind charity-shop vinyl' },
-    { t: '21:30', name: 'Night Nurses', host: 'Theresa Coyle · Dublin', kind: 'Call-in for people working the late shift' },
-    { t: '23:00', name: 'Words for Rain', host: 'Kiri Walker · Wellington', kind: 'Poetry read aloud, listeners send lines' },
-    { t: '00:30', name: 'The Quiet Hour', host: 'Field Recording Society', kind: 'No talking. Just a microphone out a window.' },
-  ];
+  shows.forEach(s => { if (s.live) s.live.start = now0 - s.live.minAgo * MIN; });
+  const bySlug = slug => shows.find(s => s.slug === slug);
+  const epLabel = d => `${d} Sep`;
+  // The prototype pretends it is 19:47 on Tuesday 29 September, so "since" times match "Tonight" in the schedule.
+  const CLOCK = 19 * 60 + 47;
+  const hhmm = t => { const m = Math.floor(CLOCK + (t - now0) / MIN + 1440) % 1440; return `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`; };
+  const fmt = sec => { sec = Math.max(0, Math.floor(sec)); return [sec / 3600, (sec % 3600) / 60, sec % 60].map(v => String(Math.floor(v)).padStart(2, '0')).join(':'); };
+  const fmtLen = min => min >= 60 ? `${Math.floor(min / 60)} h ${String(min % 60).padStart(2, '0')} min` : `${min} min`;
 
-  // ---------- logo ----------
+  let nobodyLive = false;
+  const reminders = new Set();
+  const archivePick = {}; // slug -> episode day chosen from a list, otherwise the latest
+
+  const liveShows = () => shows.filter(s => s.live && (!nobodyLive || s.mine)).sort((a, b) => b.live.listeners - a.live.listeners);
+  function bandItems(band) {
+    if (band === 'live') return liveShows().map(s => ({ key: 'L:' + s.slug, show: s, ep: null }));
+    return shows.filter(s => s.episodes.length)
+      .map(s => ({ show: s, ep: s.episodes.find(e => e.d === archivePick[s.slug]) || s.episodes[0] }))
+      .sort((a, b) => b.ep.d - a.ep.d)
+      .map(it => ({ ...it, key: 'A:' + it.show.slug + ':' + it.ep.d }));
+  }
+
+  // ---------- logo: speaker grille, same pattern at every size ----------
   const RINGS = 6, HOLE = 0.3;
-  function drawLogo(svg, rings) {
+  function logoSVG(rings, center) {
     const s = 40 / (rings + 0.5), r = s * HOLE;
     let out = '';
-    for (let k = 0; k <= rings; k++) {
-      const n = k === 0 ? 1 : Math.round(2 * Math.PI * k);
+    for (let k = 1; k <= rings; k++) {
+      const n = Math.round(2 * Math.PI * k);
       for (let j = 0; j < n; j++) {
         const a = (j / n) * Math.PI * 2 + (k % 2 ? Math.PI / n : 0) - Math.PI / 2;
-        const x = (Math.cos(a) * k * s).toFixed(2), y = (Math.sin(a) * k * s).toFixed(2);
-        out += k === 0
-          ? `<circle cx="0" cy="0" r="${(r * 1.15).toFixed(2)}" fill="var(--orange)"/>`
-          : `<circle cx="${x}" cy="${y}" r="${r.toFixed(2)}" fill="var(--ink)"/>`;
+        out += `<circle cx="${(Math.cos(a) * k * s).toFixed(2)}" cy="${(Math.sin(a) * k * s).toFixed(2)}" r="${r.toFixed(2)}" fill="var(--ink)"/>`;
       }
     }
-    svg.innerHTML = out;
+    return out + `<circle cx="0" cy="0" r="${(r * 1.15).toFixed(2)}" fill="${center}" stroke="var(--ink)" stroke-width="${center === 'var(--orange)' ? 0 : 0.6}"/>`;
   }
-  document.querySelectorAll('svg.logo').forEach(svg => drawLogo(svg, RINGS));
+  document.querySelectorAll('svg.logo').forEach(svg => svg.innerHTML = logoSVG(RINGS, 'var(--orange)'));
 
-  // ---------- dial ----------
-  const ticks = $('ticks'), labels = $('labels');
-  for (let f = 88; f <= 108; f += 0.5) {
-    const t = document.createElement('span');
-    t.style.left = pct(f) + '%';
-    if (f % 2 === 0) t.className = 'major';
-    ticks.appendChild(t);
-  }
-  for (let f = 88; f <= 108; f += 4) {
-    const l = document.createElement('span');
-    l.style.left = pct(f) + '%'; l.textContent = f;
-    labels.appendChild(l);
-  }
-
-  let freq = 98.9, powered = false, volume = 0.7;
-
-  function signalFor(s, f) { return Math.max(0, 1 - Math.abs(f - s.f) / 0.55); }
-  function strongest(f) {
+  // ---------- receiver state ----------
+  let band = 'live', items = [], pos = 12.5, powered = false, volume = 0.7;
+  const tuneState = {}; // key -> { progress } for archive playback position
+  const width = () => Math.min(100 / Math.max(items.length, 1) * 0.42, 9);
+  const signalFor = it => Math.max(0, 1 - Math.abs(pos - it.pos) / width());
+  function strongest() {
     let best = null, sig = 0;
-    for (const s of stations) { const v = signalFor(s, f); if (v > sig) { sig = v; best = s; } }
+    for (const it of items) { const v = signalFor(it); if (v > sig) { sig = v; best = it; } }
     return { best, sig };
   }
+  function progressOf(it) {
+    if (!tuneState[it.key]) tuneState[it.key] = { progress: Math.floor(Math.random() * it.ep.len * 60 * 0.3) };
+    return tuneState[it.key];
+  }
 
+  function renderReadout() {
+    const { best, sig } = strongest();
+    if (best && sig > 0.2) {
+      if (best.ep) {
+        $('readTime').textContent = fmt(progressOf(best).progress);
+        $('readUnit').textContent = '/ ' + fmt(best.ep.len * 60).replace(/^00:/, '');
+      } else {
+        $('readTime').textContent = fmt((Date.now() - best.show.live.start) / 1000);
+        $('readUnit').textContent = 'LIVE';
+      }
+    } else { $('readTime').textContent = '--:--:--'; $('readUnit').textContent = ''; }
+  }
   function render() {
-    const { best, sig } = strongest(freq);
-    $('freq').textContent = freq.toFixed(1);
-    $('needle').style.left = pct(freq) + '%';
-    $('tuner').value = freq;
+    const { best, sig } = strongest();
+    renderReadout();
+    $('needle').style.left = pos + '%';
+    $('tuner').value = pos;
     const bars = Math.round(sig * 5);
     [...$('signal').children].forEach((b, i) => b.classList.toggle('on', i < bars));
-    $('onairLamp').classList.toggle('lit', sig > 0.6);
+    $('onairLamp').classList.toggle('lit', !!best && !best.ep && sig > 0.6);
+    const name = $('showName');
     if (best && sig > 0.2) {
-      $('showName').textContent = best.name;
-      $('showMeta').textContent = `${best.host} · ${best.city} · ${best.listeners} listening`;
+      const s = best.show;
+      name.textContent = s.name; name.href = '#' + s.slug;
+      $('showMeta').textContent = best.ep
+        ? `${s.host} · ${s.city} · recorded ${epLabel(best.ep.d)}`
+        : `${s.host} · ${s.city} · ${s.live.listeners} listening`;
     } else {
-      $('showName').textContent = 'Between stations';
-      $('showMeta').textContent = 'Only static here. Keep turning.';
+      name.textContent = 'Between shows'; name.removeAttribute('href');
+      $('showMeta').textContent = 'Only static here. Keep turning, or press Another show.';
     }
-    document.querySelectorAll('.key').forEach(k => k.setAttribute('aria-pressed', Math.abs(+k.dataset.f - freq) < 0.05 ? 'true' : 'false'));
+    document.querySelectorAll('.key').forEach(k => k.setAttribute('aria-pressed', best && sig > 0.9 && k.dataset.key === best.key ? 'true' : 'false'));
+    renderTransport();
     audioTune();
   }
-
-  function renderStations() {
-    stations.sort((a, b) => a.f - b.f);
-    $('markers').innerHTML = stations.map(s => `<span style="left:${pct(s.f)}%;--c:${s.c}"></span>`).join('');
-    $('keys').innerHTML = stations.map(s =>
-      `<button type="button" class="key" data-f="${s.f}" style="--c:${s.c}" aria-pressed="false" aria-label="${esc(s.name)}, ${s.f} megahertz"><span>${s.f.toFixed(1)}</span><span class="cap"></span><span class="led"></span></button>`).join('');
-    $('liveCount').textContent = stations.length;
-    renderList();
-    render();
+  function renderTransport() {
+    const hasLive = liveShows().length > 0;
+    const next = shows.filter(s => s.next).sort((a, b) => a.next.sort - b.next.sort)[0];
+    $('transportTitle').textContent = powered ? (band === 'live' ? 'Listening live' : 'Playing from the archive') : 'Press to listen';
+    let sub;
+    if (!hasLive) sub = `Nobody is live right now, so the radio plays from the archive. Next live: ${next.name}, ${next.next.label.replace('Tonight', 'tonight at')}.`;
+    else if (!powered) sub = band === 'live' ? 'Starts with the most popular live show.' : 'Starts with the newest recording.';
+    else sub = 'Drag the dial between shows, or press Another show.';
+    $('transportSub').textContent = sub;
   }
 
-  function renderList() {
-    const rows = [...stations].sort((a, b) => (b.mine ? 1 : 0) - (a.mine ? 1 : 0) || b.listeners - a.listeners);
-    $('onairList').innerHTML = rows.map(s => `
-      <li class="${s.mine ? 'mine' : ''}">
-        <span class="f"><i class="swatch" style="--c:${s.c}"></i>${s.f.toFixed(1)}</span>
-        <div><div class="t">${esc(s.name)}${s.mine ? '<span class="you">You</span>' : ''}</div><div class="h">${esc(s.host)} · ${esc(s.city)}</div></div>
-        <span class="k">${esc(s.kind)}</span>
-        <span class="n">${s.listeners} listening</span>
-        <button type="button" class="btn" data-tune="${s.f}">Tune in</button>
-      </li>`).join('');
-    const total = stations.reduce((n, s) => n + s.listeners, 0);
-    $('totalListeners').textContent = `${total.toLocaleString()} listening`;
+  function renderBand() {
+    const hasLive = liveShows().length > 0;
+    if (!hasLive && band === 'live') band = 'archive';
+    items = bandItems(band);
+    items.forEach((it, i) => it.pos = Math.round(((i + 0.5) / items.length) * 1000) / 10);
+    document.querySelectorAll('.band button').forEach(b => {
+      b.setAttribute('aria-checked', b.dataset.band === band);
+      if (b.dataset.band === 'live') { b.disabled = !hasLive; b.title = hasLive ? '' : 'Nobody is live right now'; }
+    });
+    $('markers').innerHTML = items.map(it => `<span style="left:${it.pos}%;--c:${it.show.c}"></span>`).join('');
+    $('keys').innerHTML = items.map(it => {
+      const lbl = it.ep ? epLabel(it.ep.d).toUpperCase() : hhmm(it.show.live.start);
+      const aria = it.ep ? `${it.show.name}, recorded ${epLabel(it.ep.d)}` : `${it.show.name}, live since ${lbl}`;
+      return `<button type="button" class="key" data-key="${it.key}" style="--c:${it.show.c}" aria-pressed="false" aria-label="${esc(aria)}"><span>${lbl}</span><span class="cap"></span><span class="led"></span></button>`;
+    }).join('');
+    $('dialLeft').textContent = band === 'live' ? `${items.length} live ${items.length === 1 ? 'show' : 'shows'}` : `${items.length} recordings`;
+    const n = liveShows().length;
+    $('liveCount').textContent = n ? `${n} live now` : 'Nobody live · playing the archive';
+    $('liveDot').classList.toggle('off', !n);
   }
-  function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
 
-  $('schedList').innerHTML = schedule.map((s, i) => `
-    <li>
-      <span class="f">${s.t}</span>
-      <div><div class="t">${s.name}</div><div class="h">${s.host}</div></div>
-      <span class="k">${s.kind}</span>
-      <button type="button" class="btn" id="remind${i}" aria-pressed="false">Remind me</button>
-    </li>`).join('');
-  $('schedList').addEventListener('click', e => {
-    const b = e.target.closest('button'); if (!b) return;
-    const on = b.getAttribute('aria-pressed') !== 'true';
-    b.setAttribute('aria-pressed', on); b.textContent = on ? 'Reminder set' : 'Remind me';
-  });
-
-  // tuning interactions
+  // tuning
   let anim = null;
-  function setFreq(v) { freq = Math.round(Math.min(MAX, Math.max(MIN, v)) * 10) / 10; render(); }
+  function setPos(v) { pos = Math.round(Math.min(100, Math.max(0, v)) * 10) / 10; render(); }
   function sweepTo(target) {
     cancelAnimationFrame(anim);
-    const from = freq, t0 = performance.now(), dur = reduceMotion ? 1 : 260 + Math.abs(target - from) * 45;
-    const step = now => {
-      const p = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - p, 3);
-      freq = Math.round((from + (target - from) * e) * 10) / 10; render();
+    const from = pos, t0 = performance.now(), dur = reduceMotion ? 1 : 250 + Math.abs(target - from) * 9;
+    const step = t => {
+      const p = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - p, 3);
+      pos = Math.round((from + (target - from) * e) * 10) / 10; render();
       if (p < 1) anim = requestAnimationFrame(step);
     };
     anim = requestAnimationFrame(step);
   }
-  $('tuner').addEventListener('input', e => { cancelAnimationFrame(anim); setFreq(+e.target.value); });
-  $('dial').addEventListener('wheel', e => { e.preventDefault(); cancelAnimationFrame(anim); setFreq(freq + (e.deltaY > 0 || e.deltaX > 0 ? 0.1 : -0.1)); }, { passive: false });
-  $('keys').addEventListener('click', e => { const k = e.target.closest('.key'); if (k) { sweepTo(+k.dataset.f); if (!powered) togglePower(); } });
-  $('onairList').addEventListener('click', e => {
-    const b = e.target.closest('[data-tune]'); if (!b) return;
-    $('listen').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' });
-    sweepTo(+b.dataset.tune); if (!powered) togglePower();
+  function setBand(b, key) {
+    band = b; renderBand();
+    const target = items.find(it => it.key === key) || items[0];
+    if (target) sweepTo(target.pos); else render();
+  }
+  function tuneShow(bandName, slug, epDay) {
+    if (bandName === 'archive' && epDay) archivePick[slug] = epDay;
+    band = bandName; renderBand();
+    const it = items.find(i => i.show.slug === slug);
+    setBand(bandName, it && it.key);
+    if (!powered) togglePower();
+  }
+  $('tuner').addEventListener('input', e => { cancelAnimationFrame(anim); setPos(+e.target.value); });
+  $('dial').addEventListener('wheel', e => { e.preventDefault(); cancelAnimationFrame(anim); setPos(pos + (e.deltaY > 0 || e.deltaX > 0 ? 0.6 : -0.6)); }, { passive: false });
+  $('keys').addEventListener('click', e => {
+    const k = e.target.closest('.key'); if (!k) return;
+    const it = items.find(i => i.key === k.dataset.key); if (it) sweepTo(it.pos);
+    if (!powered) togglePower();
   });
+  document.querySelector('.band').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b || b.disabled || b.dataset.band === band) return;
+    setBand(b.dataset.band);
+  });
+  $('another').addEventListener('click', () => {
+    const { best } = strongest();
+    const pool = items.filter(it => !best || it.key !== best.key);
+    if (!pool.length) return;
+    sweepTo(pool[Math.floor(Math.random() * pool.length)].pos);
+    if (!powered) togglePower();
+  });
+  $('simulate').addEventListener('click', () => {
+    nobodyLive = !nobodyLive;
+    $('simulate').textContent = nobodyLive ? 'Bring the live shows back' : 'Preview the homepage when nobody is live';
+    setBand(liveShows().length ? 'live' : 'archive');
+    renderLists();
+  });
+
+  // ---------- lists + search ----------
+  let q = '';
+  const match = s => !q || [s.name, s.host, s.city, s.kind].join(' ').toLowerCase().includes(q);
+  function renderLists() {
+    const live = liveShows().filter(match);
+    $('onairList').innerHTML = live.length ? live.map(s => `
+      <li>
+        <span class="f"><i class="swatch" style="--c:${s.c}"></i>Since ${hhmm(s.live.start)}</span>
+        <div><a class="t" href="#${s.slug}">${esc(s.name)}</a>${s.mine ? '<span class="you">You</span>' : ''}<div class="h">${esc(s.host)} · ${esc(s.city)}</div></div>
+        <span class="k">${esc(s.kind)}</span>
+        <span class="n">${s.live.listeners} listening</span>
+        <button type="button" class="btn" data-live="${s.slug}">Listen</button>
+      </li>`).join('')
+      : `<li class="empty">${q ? `No live shows match “${esc(q)}”.` : 'Nobody is live right now. The radio is playing from the archive until the next show starts.'}</li>`;
+    const total = liveShows().reduce((n, s) => n + s.live.listeners, 0);
+    $('totalListeners').textContent = total ? `${total.toLocaleString()} listening` : '';
+
+    const coming = shows.filter(s => s.next && match(s)).sort((a, b) => a.next.sort - b.next.sort);
+    $('comingList').innerHTML = coming.length ? coming.map(s => `
+      <li>
+        <span class="f"><i class="swatch" style="--c:${s.c}"></i>${esc(s.next.label)}</span>
+        <div><a class="t" href="#${s.slug}">${esc(s.name)}</a>${s.mine ? '<span class="you">You</span>' : ''}<div class="h">${esc(s.host)} · ${esc(s.city)}</div></div>
+        <span class="k">${esc(s.kind)}</span>
+        <span class="n">${esc(s.schedule.replace(/ at .*/, ''))}</span>
+        <button type="button" class="btn" data-remind="${s.slug}" aria-pressed="${reminders.has(s.slug)}">${reminders.has(s.slug) ? 'Reminder set' : 'Remind me'}</button>
+      </li>`).join('') : `<li class="empty">No upcoming shows match “${esc(q)}”.</li>`;
+
+    const eps = shows.filter(match).flatMap(s => s.episodes.map(ep => ({ s, ep }))).sort((a, b) => b.ep.d - a.ep.d);
+    $('archiveList').innerHTML = eps.length ? eps.map(({ s, ep }) => `
+      <li>
+        <span class="f"><i class="swatch" style="--c:${s.c}"></i>${epLabel(ep.d)}</span>
+        <div><a class="t" href="#${s.slug}">${esc(s.name)}</a>${s.mine ? '<span class="you">You</span>' : ''}<div class="h">${esc(s.host)} · ${esc(s.city)}</div></div>
+        <span class="k">${fmtLen(ep.len)}</span>
+        <span class="n">${ep.plays.toLocaleString()} plays</span>
+        <button type="button" class="btn" data-ep="${s.slug}" data-d="${ep.d}">Play</button>
+      </li>`).join('') : `<li class="empty">Nothing in the archive matches “${esc(q)}”.</li>`;
+  }
+  $('q').addEventListener('input', e => { q = e.target.value.trim().toLowerCase(); $('clearQ').hidden = !q; renderLists(); });
+  $('searchForm').addEventListener('submit', e => { e.preventDefault(); $('on-air').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' }); });
+  $('clearQ').addEventListener('click', () => { $('q').value = ''; q = ''; $('clearQ').hidden = true; renderLists(); $('q').focus(); });
+
+  function goListen() { if (location.hash !== '#listen') location.hash = 'listen'; else $('listen').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' }); }
+  document.addEventListener('click', e => {
+    const b = e.target.closest('button[data-live], button[data-ep], button[data-remind]'); if (!b) return;
+    if (b.dataset.remind) {
+      const slug = b.dataset.remind;
+      reminders.has(slug) ? reminders.delete(slug) : reminders.add(slug);
+      renderLists(); if (!$('showView').hidden) renderShowPage(bySlug(slug));
+      return;
+    }
+    goListen();
+    if (b.dataset.live) tuneShow('live', b.dataset.live);
+    else tuneShow('archive', b.dataset.ep, +b.dataset.d);
+  });
+
+  // ---------- show pages (each show has its own address) ----------
+  function renderShowPage(s) {
+    const live = s.live && (!nobodyLive || s.mine);
+    const latest = s.episodes[0];
+    $('showView').innerHTML = `
+      <a class="back" href="#listen">← All shows</a>
+      <div class="show-hero">
+        <div class="show-mark"><svg viewBox="-44 -44 88 88" role="img" aria-label="${esc(s.name)} mark">${logoSVG(RINGS, s.c)}</svg></div>
+        <div class="show-info">
+          <span class="label">${live ? `<span class="lamp lit">On air since ${hhmm(s.live.start)}</span>` : esc(s.kind)}</span>
+          <h1>${esc(s.name)}</h1>
+          <p>${esc(s.kind)}. Hosted by ${esc(s.host)} in ${esc(s.city)}.</p>
+          <div class="show-url">radioforthepeople.org/${s.slug}</div>
+          <dl class="facts">
+            <dt>When</dt><dd>${esc(s.schedule)}</dd>
+            <dt>Next</dt><dd>${s.next ? esc(s.next.label) : live ? 'On air now' : 'Not scheduled yet'}</dd>
+            <dt>Archive</dt><dd>${s.episodes.length ? `${s.episodes.length} ${s.episodes.length === 1 ? 'recording' : 'recordings'}` : 'No recordings yet'}</dd>
+          </dl>
+          <div class="actions">
+            ${live ? `<button type="button" class="pill live onair" data-live="${s.slug}">Listen live</button>`
+                   : latest ? `<button type="button" class="pill" data-ep="${s.slug}" data-d="${latest.d}">Play latest recording</button>` : ''}
+            ${s.next ? `<button type="button" class="btn" data-remind="${s.slug}" aria-pressed="${reminders.has(s.slug)}">${reminders.has(s.slug) ? 'Reminder set' : 'Remind me'}</button>` : ''}
+          </div>
+        </div>
+      </div>
+      <section class="block" aria-labelledby="eps-h">
+        <div class="block-head"><h2 id="eps-h">Recordings</h2><span class="label">${s.episodes.length}</span></div>
+        <ul class="rows">${s.episodes.length ? s.episodes.map(ep => `
+          <li>
+            <span class="f"><i class="swatch" style="--c:${s.c}"></i>${epLabel(ep.d)}</span>
+            <div><span class="t">${esc(s.name)}, ${epLabel(ep.d)}</span><div class="h">Recorded live</div></div>
+            <span class="k">${fmtLen(ep.len)}</span>
+            <span class="n">${ep.plays.toLocaleString()} plays</span>
+            <button type="button" class="btn" data-ep="${s.slug}" data-d="${ep.d}">Play</button>
+          </li>`).join('') : '<li class="empty">No recordings yet. They appear here after each live show.</li>'}
+        </ul>
+      </section>`;
+  }
+  function route() {
+    const h = decodeURIComponent(location.hash.slice(1));
+    const s = bySlug(h);
+    $('home').hidden = !!s; $('showView').hidden = !s;
+    if (s) { renderShowPage(s); window.scrollTo(0, 0); }
+    else if (h) { const el = document.getElementById(h); if (el) el.scrollIntoView(); }
+  }
+  addEventListener('hashchange', route);
 
   // ---------- audio ----------
   let ac, master, analyser, staticGain, staticFilter, delayIn, noiseBuf, freqData;
+  const nodes = {}; // item key -> voice
   const mulberry = a => () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
   const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
   const PROG = [[0, 4, 7, 11], [5, 9, 12, 16], [-3, 0, 4, 7], [2, 5, 9, 12]];
@@ -584,68 +753,68 @@ footer .wordmark { font-size: 14px; color: var(--ink); }
     analyser = ac.createAnalyser(); analyser.fftSize = 256; analyser.smoothingTimeConstant = 0.75;
     freqData = new Uint8Array(analyser.frequencyBinCount);
     master.connect(analyser); analyser.connect(ac.destination);
-
     noiseBuf = ac.createBuffer(1, ac.sampleRate * 2, ac.sampleRate);
     const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
     const src = ac.createBufferSource(); src.buffer = noiseBuf; src.loop = true;
     staticFilter = ac.createBiquadFilter(); staticFilter.type = 'bandpass'; staticFilter.frequency.value = 2200; staticFilter.Q.value = 0.5;
     staticGain = ac.createGain(); staticGain.gain.value = 0;
     src.connect(staticFilter).connect(staticGain).connect(master); src.start();
-
     const delay = ac.createDelay(1); delay.delayTime.value = 0.36;
     const fb = ac.createGain(); fb.gain.value = 0.32;
     const wet = ac.createGain(); wet.gain.value = 0.25;
     delay.connect(fb).connect(delay); delay.connect(wet).connect(master);
     delayIn = delay;
-
-    stations.forEach(setupStation);
     setInterval(scheduler, 40);
   }
-  function setupStation(s) {
-    if (!ac || s.out) return;
-    s.out = ac.createGain(); s.out.gain.value = 0; s.out.connect(master);
-    if (s.sound.type !== 'talk') s.out.connect(delayIn);
-    if (s.sound.type === 'talk') { const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 3200; s.bus = ac.createGain(); s.bus.connect(lp).connect(s.out); }
-    else s.bus = s.out;
-    s.next = ac.currentTime + 0.05; s.step = 0; s.rnd = mulberry(Math.round(s.f * 10)); s.level = 0; s.voice = 0;
+  function voiceFor(it) {
+    if (!ac) return null;
+    if (nodes[it.key]) return nodes[it.key];
+    const v = { sound: it.show.sound, step: 0, voice: 0, level: 0, next: ac.currentTime + 0.05, rnd: mulberry(it.key.length * 997 + it.show.slug.charCodeAt(0) * 31 + (it.ep ? it.ep.d : 0)) };
+    v.out = ac.createGain(); v.out.gain.value = 0; v.out.connect(master);
+    if (v.sound.type === 'talk') { const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 3200; v.bus = ac.createGain(); v.bus.connect(lp).connect(v.out); }
+    else { v.bus = v.out; v.out.connect(delayIn); }
+    // archive recordings sound a little older: gentle low-pass
+    if (it.ep && v.sound.type !== 'talk') { const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 4200; v.bus = ac.createGain(); v.bus.connect(lp).connect(v.out); }
+    return nodes[it.key] = v;
   }
   function audioTune() {
     if (!ac) return;
-    const now = ac.currentTime; let maxSig = 0;
-    for (const s of stations) {
-      const v = Math.pow(signalFor(s, freq), 1.4); maxSig = Math.max(maxSig, v); s.level = v;
-      s.out && s.out.gain.setTargetAtTime(v, now, 0.04);
+    const t = ac.currentTime; let maxSig = 0;
+    const active = new Set();
+    for (const it of items) {
+      const v = voiceFor(it), lvl = Math.pow(signalFor(it), 1.4);
+      maxSig = Math.max(maxSig, lvl); v.level = lvl; v.out.gain.setTargetAtTime(lvl, t, 0.04); active.add(it.key);
     }
-    staticGain.gain.setTargetAtTime(0.012 + 0.16 * Math.pow(1 - maxSig, 1.3), now, 0.04);
-    staticFilter.frequency.setTargetAtTime(1400 + ((freq * 10) % 17) * 110, now, 0.05);
+    for (const k in nodes) if (!active.has(k)) { nodes[k].level = 0; nodes[k].out.gain.setTargetAtTime(0, t, 0.04); }
+    staticGain.gain.setTargetAtTime(0.012 + 0.16 * Math.pow(1 - maxSig, 1.3), t, 0.04);
+    staticFilter.frequency.setTargetAtTime(1400 + ((pos * 10) % 17) * 110, t, 0.05);
   }
   function setMaster() { if (ac) master.gain.setTargetAtTime(powered ? volume * 0.9 : 0, ac.currentTime, 0.06); }
 
-  function tone(s, t, midi, dur, o = {}) {
+  function tone(v, t, midi, dur, o = {}) {
     const osc = ac.createOscillator(), g = ac.createGain();
     osc.type = o.wave || 'sine'; osc.frequency.value = mtof(midi);
     if (o.detune) osc.detune.value = o.detune;
-    const atk = Math.min(o.attack || 0.01, dur * 0.8), vol = o.vol || 0.1;
-    g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(vol, t + atk);
-    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    const atk = Math.min(o.attack || 0.01, dur * 0.8);
+    g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(o.vol || 0.1, t + atk); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
     let node = osc;
     if (o.cutoff) { const f = ac.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = o.cutoff; osc.connect(f); node = f; }
-    node.connect(g).connect(s.bus); osc.start(t); osc.stop(t + dur + 0.05);
+    node.connect(g).connect(v.bus); osc.start(t); osc.stop(t + dur + 0.05);
   }
-  function hat(s, t, vol) {
+  function hat(v, t, vol) {
     const src = ac.createBufferSource(); src.buffer = noiseBuf;
     const hp = ac.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 7000;
     const g = ac.createGain(); g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.04);
-    src.connect(hp).connect(g).connect(s.bus); src.start(t, Math.random()); src.stop(t + 0.06);
+    src.connect(hp).connect(g).connect(v.bus); src.start(t, Math.random()); src.stop(t + 0.06);
   }
-  function kick(s, t) {
+  function kick(v, t) {
     const o = ac.createOscillator(), g = ac.createGain();
     o.frequency.setValueAtTime(110, t); o.frequency.exponentialRampToValueAtTime(42, t + 0.12);
     g.gain.setValueAtTime(0.35, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.25);
-    o.connect(g).connect(s.bus); o.start(t); o.stop(t + 0.3);
+    o.connect(g).connect(v.bus); o.start(t); o.stop(t + 0.3);
   }
-  function syllable(s, t, base) {
-    const r = s.rnd, dur = 0.07 + r() * 0.13;
+  function syllable(v, t, base) {
+    const r = v.rnd, dur = 0.07 + r() * 0.13;
     const o = ac.createOscillator(); o.type = 'sawtooth';
     const p = base * (0.9 + r() * 0.35);
     o.frequency.setValueAtTime(p, t); o.frequency.linearRampToValueAtTime(p * (0.82 + r() * 0.25), t + dur);
@@ -653,99 +822,91 @@ footer .wordmark { font-size: 14px; color: var(--ink); }
     const f2 = ac.createBiquadFilter(); f2.type = 'bandpass'; f2.frequency.value = 950 + r() * 1400; f2.Q.value = 7;
     const g = ac.createGain();
     g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.9, t + 0.018); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-    o.connect(f1); o.connect(f2); f1.connect(g); f2.connect(g); g.connect(s.bus);
+    o.connect(f1); o.connect(f2); f1.connect(g); f2.connect(g); g.connect(v.bus);
     o.start(t); o.stop(t + dur + 0.05);
     return dur;
   }
-
-  function play(s, t) {
-    const S = s.sound, r = s.rnd;
+  function play(v, t) {
+    const S = v.sound, r = v.rnd;
     if (S.type === 'pad') {
-      const beat = 60 / S.tempo, chord = PROG[Math.floor(s.step / 8) % 4];
-      if (s.step % 8 === 0) {
-        chord.forEach(c => tone(s, t, S.root + c, beat * 8.5, { wave: S.choir ? 'sawtooth' : 'triangle', vol: S.choir ? 0.022 : 0.045, attack: beat * 2, cutoff: S.choir ? 1100 : 1600, detune: (r() - 0.5) * 14 }));
-        tone(s, t, S.root + chord[0] - 12, beat * 8, { wave: 'sine', vol: 0.08, attack: 0.3 });
+      const beat = 60 / S.tempo, chord = PROG[Math.floor(v.step / 8) % 4];
+      if (v.step % 8 === 0) {
+        chord.forEach(c => tone(v, t, S.root + c, beat * 8.5, { wave: S.choir ? 'sawtooth' : 'triangle', vol: S.choir ? 0.022 : 0.045, attack: beat * 2, cutoff: S.choir ? 1100 : 1600, detune: (r() - 0.5) * 14 }));
+        tone(v, t, S.root + chord[0] - 12, beat * 8, { vol: 0.08, attack: 0.3 });
       }
-      if (!S.choir && r() < 0.5) tone(s, t, S.root + 12 + PENTA[Math.floor(r() * 5)] + (r() < 0.25 ? 12 : 0), beat * 1.6, { vol: 0.07, attack: 0.015 });
-      if (S.choir && s.step % 2 === 0) tone(s, t, S.root + 12 + chord[Math.floor(r() * 3)], beat * 2.2, { wave: 'sawtooth', vol: 0.02, attack: beat * 0.6, cutoff: 1400 });
-      s.next += beat;
+      if (!S.choir && !S.still && r() < 0.5) tone(v, t, S.root + 12 + PENTA[Math.floor(r() * 5)] + (r() < 0.25 ? 12 : 0), beat * 1.6, { vol: 0.07, attack: 0.015 });
+      if (S.still && r() < 0.18) hat(v, t, 0.02);
+      if (S.choir && v.step % 2 === 0) tone(v, t, S.root + 12 + chord[Math.floor(r() * 3)], beat * 2.2, { wave: 'sawtooth', vol: 0.02, attack: beat * 0.6, cutoff: 1400 });
+      v.next += beat;
     } else if (S.type === 'arp') {
-      const beat = 60 / S.tempo / 2, chord = PROG[Math.floor(s.step / 16) % 4];
-      const idx = [0, 1, 2, 3, 2, 1, 2, 0][s.step % 8];
-      tone(s, t, S.root + 12 + chord[idx], beat * 0.9, { wave: 'square', vol: 0.03, cutoff: 900 + 700 * Math.sin(s.step / 10) + 700 });
-      if (s.step % 8 === 0) tone(s, t, S.root + chord[0] - 12, beat * 7, { wave: 'triangle', vol: 0.1, attack: 0.02 });
-      s.next += beat;
+      const beat = 60 / S.tempo / 2, chord = PROG[Math.floor(v.step / 16) % 4];
+      tone(v, t, S.root + 12 + chord[[0, 1, 2, 3, 2, 1, 2, 0][v.step % 8]], beat * 0.9, { wave: 'square', vol: 0.03, cutoff: 1600 + 700 * Math.sin(v.step / 10) });
+      if (v.step % 8 === 0) tone(v, t, S.root + chord[0] - 12, beat * 7, { wave: 'triangle', vol: 0.1, attack: 0.02 });
+      v.next += beat;
     } else if (S.type === 'groove') {
-      const beat = 60 / S.tempo / 2, pos = s.step % 8, chord = PROG[Math.floor(s.step / 16) % 4];
-      if (pos === 0 || pos === 4) kick(s, t);
-      if (pos % 2 === 1) hat(s, t, 0.06);
-      if ([0, 3, 6].includes(pos)) tone(s, t, S.root + chord[0] + (pos === 6 ? 7 : 0), beat * 1.1, { wave: 'triangle', vol: 0.16, cutoff: 700 });
-      if (pos === 2 || pos === 6) chord.slice(1).forEach(c => tone(s, t, S.root + 12 + c, beat * 1.2, { wave: 'sine', vol: 0.035, attack: 0.005 }));
-      s.next += beat;
+      const beat = 60 / S.tempo / 2, p = v.step % 8, chord = PROG[Math.floor(v.step / 16) % 4];
+      if (p === 0 || p === 4) kick(v, t);
+      if (p % 2 === 1) hat(v, t, 0.06);
+      if ([0, 3, 6].includes(p)) tone(v, t, S.root + chord[0] + (p === 6 ? 7 : 0), beat * 1.1, { wave: 'triangle', vol: 0.16, cutoff: 700 });
+      if (p === 2 || p === 6) chord.slice(1).forEach(c => tone(v, t, S.root + 12 + c, beat * 1.2, { vol: 0.035, attack: 0.005 }));
+      v.next += beat;
     } else if (S.type === 'talk') {
-      if (r() < 0.12) { s.next += 0.35 + r() * 0.6; if (r() < 0.35) s.voice = (s.voice + 1) % S.voices.length; }
-      else s.next += syllable(s, t, S.voices[s.voice]) + 0.02 + r() * 0.06;
+      if (r() < 0.12) { v.next += 0.35 + r() * 0.6; if (r() < 0.35) v.voice = (v.voice + 1) % S.voices.length; }
+      else v.next += syllable(v, t, S.voices[v.voice]) + 0.02 + r() * 0.06;
     } else if (S.type === 'bell') {
-      tone(s, t, 74, 1.4, { vol: 0.08 }); tone(s, t, 86, 0.8, { vol: 0.03 });
-      s.next += 1.6;
+      tone(v, t, 74, 1.4, { vol: 0.08 }); tone(v, t, 86, 0.8, { vol: 0.03 });
+      v.next += 1.6;
     }
-    s.step++;
+    v.step++;
   }
   function scheduler() {
     if (!powered) return;
-    const now = ac.currentTime, ahead = now + 0.15;
-    for (const s of stations) {
-      if (!s.out) continue;
-      if (s.level < 0.004) { s.next = Math.max(s.next, now); continue; }
-      if (s.next < now) s.next = now;
-      while (s.next < ahead) play(s, s.next);
+    const t = ac.currentTime, ahead = t + 0.15;
+    for (const k in nodes) {
+      const v = nodes[k];
+      if (v.level < 0.004) { v.next = Math.max(v.next, t); continue; }
+      if (v.next < t) v.next = t;
+      while (v.next < ahead) play(v, v.next);
     }
   }
-
   function togglePower() {
     powered = !powered;
-    if (powered) { if (!ac) initAudio(); ac.resume(); audioTune(); }
+    if (powered) { if (!ac) initAudio(); ac.resume(); }
     setMaster();
     $('power').setAttribute('aria-pressed', powered);
     $('power').setAttribute('aria-label', powered ? 'Stop listening' : 'Listen');
-    $('transportTitle').textContent = powered ? 'Listening' : 'Press to listen';
-    $('transportSub').textContent = powered ? 'Drag the dial between stations to hear the static.' : 'Then drag the dial or press a station key.';
+    render();
   }
   $('power').addEventListener('click', togglePower);
   $('volume').addEventListener('input', e => { volume = +e.target.value; setMaster(); });
 
   // ---------- speaker grille (the logo, at full size) ----------
   const cv = $('grille'), g2 = cv.getContext('2d');
-  let holes = [], rings = RINGS, ringE = new Float32Array(rings + 1), size = 0, dpr = 1;
+  let holes = [], ringE = new Float32Array(RINGS + 1), size = 0, dpr = 1, hr = 4;
   function layout() {
     dpr = Math.min(2, window.devicePixelRatio || 1);
-    size = cv.clientWidth; cv.width = size * dpr; cv.height = size * dpr;
-    const R = size / 2, s = (R * 0.94) / (rings + 0.5);
+    size = cv.clientWidth; if (!size) return;
+    cv.width = size * dpr; cv.height = size * dpr;
+    const R = size / 2, s = (R * 0.94) / (RINGS + 0.5);
     holes = [];
-    for (let k = 0; k <= rings; k++) {
+    for (let k = 0; k <= RINGS; k++) {
       const n = k === 0 ? 1 : Math.round(2 * Math.PI * k);
       for (let j = 0; j < n; j++) {
         const a = (j / n) * Math.PI * 2 + (k % 2 ? Math.PI / n : 0) - Math.PI / 2;
         holes.push({ k, x: R + Math.cos(a) * k * s, y: R + Math.sin(a) * k * s });
       }
     }
-    layout.hr = s * HOLE;
-    draw();
+    hr = s * HOLE; draw();
   }
-  function css(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+  const css = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
   function draw() {
     const hole = css('--hole'), orange = css('--orange');
-    const R = size / 2, hr = layout.hr;
-    g2.setTransform(dpr, 0, 0, dpr, 0, 0);
-    g2.clearRect(0, 0, size, size);
+    g2.setTransform(dpr, 0, 0, dpr, 0, 0); g2.clearRect(0, 0, size, size);
     for (const h of holes) {
       const e = powered ? ringE[h.k] : 0;
-      if (h.k === 0) {
-        g2.beginPath(); g2.arc(h.x, h.y, hr * (1.15 + e * 0.3), 0, Math.PI * 2); g2.fillStyle = orange; g2.fill();
-        continue;
-      }
-      const rad = hr * (1 + (reduceMotion ? 0 : e * 0.28));
-      g2.beginPath(); g2.arc(h.x, h.y, rad, 0, Math.PI * 2); g2.fillStyle = hole; g2.fill();
+      g2.beginPath();
+      if (h.k === 0) { g2.arc(h.x, h.y, hr * (1.15 + e * 0.3), 0, Math.PI * 2); g2.fillStyle = orange; g2.fill(); continue; }
+      g2.arc(h.x, h.y, hr * (1 + (reduceMotion ? 0 : e * 0.28)), 0, Math.PI * 2); g2.fillStyle = hole; g2.fill();
       const glow = Math.min(1, Math.max(0, (e - 0.42) * 1.8));
       if (glow > 0.02) { g2.globalAlpha = glow; g2.fillStyle = orange; g2.fill(); g2.globalAlpha = 1; }
     }
@@ -753,10 +914,9 @@ footer .wordmark { font-size: 14px; color: var(--ink); }
   function loop() {
     if (powered && analyser) {
       analyser.getByteFrequencyData(freqData);
-      for (let k = 0; k <= rings; k++) {
+      for (let k = 0; k <= RINGS; k++) {
         const bin = Math.min(freqData.length - 1, 1 + Math.floor(k * k * 1.8 + k * 3));
-        const v = freqData[bin] / 255;
-        ringE[k] = ringE[k] * 0.6 + v * 0.4;
+        ringE[k] = ringE[k] * 0.6 + (freqData[bin] / 255) * 0.4;
       }
       draw();
     } else if (ringE[1] > 0.001) { ringE.fill(0); draw(); }
@@ -767,70 +927,97 @@ footer .wordmark { font-size: 14px; color: var(--ink); }
   new MutationObserver(draw).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
   requestAnimationFrame(loop);
 
-  // listeners drift, like a real evening
+  // clocks: live time, archive playback position, listeners drifting like a real evening
+  let tick = 0;
   setInterval(() => {
-    stations.forEach(s => { if (!s.mine) s.listeners = Math.max(3, s.listeners + Math.round((Math.random() - 0.45) * 4)); });
-    renderList(); render();
-  }, 5000);
+    tick++;
+    const { best, sig } = strongest();
+    if (powered && best && best.ep && sig > 0.6) { const st = progressOf(best); st.progress = (st.progress + 1) % (best.ep.len * 60); }
+    if (tick % 5 === 0) {
+      shows.forEach(s => { if (s.live && !s.mine) s.live.listeners = Math.max(3, s.live.listeners + Math.round((Math.random() - 0.45) * 4)); });
+      renderLists(); render();
+    } else renderReadout();
+  }, 1000);
 
   // ---------- broadcast desk ----------
+  const BASE = new Date(2026, 8, 29); // Tue 29 Sep 2026, the prototype's "today"
+  const DAYS = Array.from({ length: 7 }, (_, i) => { const d = new Date(BASE); d.setDate(d.getDate() + i); return d; });
+  $('fDay').innerHTML = DAYS.map((d, i) => `<option value="${i}">${i === 0 ? 'Today, ' : ''}${d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })}</option>`).join('');
+  $('fDay').value = '2';
+  const slugify = s => s.toLowerCase().normalize('NFKD').replace(/[^\w\s-]/g, '').trim().replace(/[\s_]+/g, '-').replace(/-+/g, '-') || 'your-show';
+  const updateUrl = () => $('urlPreview').textContent = 'radioforthepeople.org/' + slugify($('fShow').value);
+  $('fShow').addEventListener('input', updateUrl); updateUrl();
+
   const meter = $('meter');
   meter.innerHTML = '<i></i>'.repeat(24);
   const cells = [...meter.children];
-  function setMeter(v) { const n = Math.round(v * 24); cells.forEach((c, i) => { c.classList.toggle('on', i < n); c.classList.toggle('hot', i >= 19); }); }
+  const setMeter = v => { const n = Math.round(v * 24); cells.forEach((c, i) => { c.classList.toggle('on', i < n); c.classList.toggle('hot', i >= 19); }); };
   let micTimer = null;
   $('micBtn').addEventListener('click', () => {
     clearInterval(micTimer);
     let t = 0, lvl = 0;
     $('meterNote').textContent = 'Listening… (simulated)';
     micTimer = setInterval(() => {
-      t += 1;
-      const target = Math.random() < 0.18 ? 0.05 : 0.45 + Math.random() * 0.35;
-      lvl = lvl * 0.5 + target * 0.5; setMeter(lvl);
+      t++;
+      lvl = lvl * 0.5 + (Math.random() < 0.18 ? 0.05 : 0.45 + Math.random() * 0.35) * 0.5; setMeter(lvl);
       if (t > 45) { clearInterval(micTimer); setMeter(0); $('meterNote').textContent = 'Level looks good. Peaks stay out of the orange.'; }
     }, 70);
   });
 
-  let mine = null, liveStart = 0, liveTick = null;
-  function freeFrequency() {
-    let best = 100, bestD = -1;
-    for (let f = 88.9; f <= 107.3; f += 0.2) {
-      const d = Math.min(...stations.map(s => Math.abs(s.f - f)));
-      if (d > bestD + 0.01) { bestD = d; best = f; }
-    }
-    return Math.round(best * 10) / 10;
+  let mine = null, liveTick = null;
+  function upsertMine() {
+    const name = $('fShow').value.trim();
+    if (!name) { $('liveMsg').innerHTML = '<span class="err">Give your show a name first.</span>'; $('fShow').focus(); return null; }
+    let slug = slugify(name);
+    if (shows.some(s => s.slug === slug && s !== mine)) slug += '-2';
+    if (!mine) { mine = { mine: true, c: '#ED3F1C', sound: { type: 'bell' }, episodes: [], live: null, next: null }; shows.push(mine); }
+    Object.assign(mine, { slug, name, host: $('fHost').value.trim() || 'You', city: 'Your place', kind: $('fAbout').value.trim() || 'A new show' });
+    return mine;
   }
   $('console').addEventListener('submit', e => {
     e.preventDefault();
-    if (!mine) {
-      const name = $('fShow').value.trim();
-      if (!name) { $('liveMsg').innerHTML = '<span class="err">Give your show a name first, then go on air.</span>'; $('fShow').focus(); return; }
-      mine = { f: freeFrequency(), name, host: $('fHost').value.trim() || 'You', city: 'Live now', kind: $('fAbout').value.trim() || 'A new show', listeners: 0, mine: true, c: '#ED3F1C', sound: { type: 'bell' } };
-      stations.push(mine); setupStation(mine); renderStations();
-      liveStart = Date.now();
+    const s = upsertMine(); if (!s) return;
+    const di = +$('fDay').value, time = $('fTime').value || '21:00', d = DAYS[di];
+    const [hh, mm] = time.split(':').map(Number);
+    const dayName = d.toLocaleDateString('en-GB', { weekday: 'long' });
+    s.next = { label: di === 0 ? (hh >= 17 ? `Tonight ${time}` : `Today ${time}`) : `${d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })} ${time}`, sort: di * 1440 + hh * 60 + mm };
+    s.schedule = $('fRepeat').value === 'weekly' ? `${dayName}s at ${time}` : `Once, ${dayName} at ${time}`;
+    renderLists();
+    $('liveMsg').innerHTML = `Scheduled for ${esc(s.next.label)}. Its page is <a href="#${s.slug}">radioforthepeople.org/${s.slug}</a>, and it is listed in Coming up.`;
+  });
+  $('goLive').addEventListener('click', () => {
+    if (!mine || !mine.live) {
+      const s = upsertMine(); if (!s) return;
+      s.live = { start: Date.now(), listeners: 0 };
       liveTick = setInterval(() => {
-        const s = Math.floor((Date.now() - liveStart) / 1000);
-        $('liveTime').textContent = [s / 3600, (s % 3600) / 60, s % 60].map(v => String(Math.floor(v)).padStart(2, '0')).join(':');
-        if (Math.random() < 0.3) mine.listeners += 1;
-        $('liveListeners').textContent = mine.listeners;
+        $('liveTime').textContent = fmt((Date.now() - s.live.start) / 1000);
+        if (Math.random() < 0.3) s.live.listeners += 1;
+        $('liveListeners').textContent = s.live.listeners;
       }, 1000);
-      $('goLive').textContent = 'End show'; $('goLive').classList.add('live');
+      $('goLive').textContent = 'End show'; $('goLive').classList.remove('ghost'); $('goLive').classList.add('live');
       $('deskLamp').classList.add('lit');
-      $('liveMsg').innerHTML = `You are on <b class="mono">${mine.f.toFixed(1)}</b>. <button type="button" id="findMe">Find it on the dial</button>`;
-      $('findMe').addEventListener('click', () => { $('listen').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' }); sweepTo(mine.f); if (!powered) togglePower(); });
+      setBand(band, strongest().best?.key); renderLists();
+      $('liveMsg').innerHTML = `You are live. <button type="button" class="linkbtn" id="findMe">Find it on the dial</button> or share <a href="#${s.slug}">radioforthepeople.org/${s.slug}</a>.`;
+      $('findMe').addEventListener('click', () => { goListen(); tuneShow('live', s.slug); });
     } else {
       clearInterval(liveTick);
-      if (mine.out) mine.out.disconnect();
-      stations.splice(stations.indexOf(mine), 1);
-      const heard = mine.listeners; mine = null; renderStations();
-      $('goLive').textContent = 'Go on air'; $('goLive').classList.remove('live');
+      const s = mine, mins = Math.max(1, Math.round((Date.now() - s.live.start) / MIN)), heard = s.live.listeners;
+      s.live = null;
+      const kept = $('fRecord').checked;
+      if (kept) s.episodes.unshift({ d: 29, len: mins, plays: heard });
+      $('goLive').textContent = 'Go live now'; $('goLive').classList.add('ghost'); $('goLive').classList.remove('live');
       $('deskLamp').classList.remove('lit');
       $('liveTime').textContent = '00:00:00'; $('liveListeners').textContent = '0';
-      $('liveMsg').textContent = `Show ended. ${heard} ${heard === 1 ? 'person' : 'people'} tuned in. Your frequency is back in the pool.`;
+      setBand(liveShows().length ? band : 'archive'); renderLists();
+      $('liveMsg').innerHTML = `Show ended. ${heard} ${heard === 1 ? 'person' : 'people'} tuned in.` + (kept ? ` The recording is in the archive and on <a href="#${s.slug}">your show page</a>.` : '');
     }
   });
 
-  renderStations();
+  // ---------- start: live if anyone is on air, otherwise the archive ----------
+  renderLists();
+  band = liveShows().length ? 'live' : 'archive';
+  renderBand(); pos = items[0] ? items[0].pos : 50; render();
+  route();
 })();
 </script>
 </body>
